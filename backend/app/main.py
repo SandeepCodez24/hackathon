@@ -4,7 +4,12 @@ GovScheme WhatsApp Chatbot — Backend Server
 """
 
 import logging
+from pathlib import Path
+from dotenv import load_dotenv
 from contextlib import asynccontextmanager
+
+# Load .env from backend/ directory
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -12,6 +17,7 @@ from app.db.database import connect_mongodb, connect_redis, disconnect, load_sch
 from app.db.scheme_orm import seed_schemes_to_db, get_all_schemes
 from app.api.schemes import router as schemes_router
 from app.api.session_api import router as session_router
+from app.api.webhook_whatsapp import router as whatsapp_router
 
 # Configure logging
 logging.basicConfig(
@@ -69,6 +75,7 @@ app.add_middleware(
 # Include routers
 app.include_router(schemes_router)
 app.include_router(session_router)
+app.include_router(whatsapp_router)
 
 
 @app.get("/", tags=["health"])

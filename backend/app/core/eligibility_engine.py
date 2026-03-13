@@ -203,6 +203,39 @@ class EligibilityEngine:
         return is_eligible, confidence
 
     @staticmethod
+    def _extract_benefit_value(benefit_text: str) -> float:
+        """
+        Extract approximate monetary value from benefit description.
+        Used for tie-breaking when confidence scores are equal.
+        E.g. "₹6,000/year" → 6000, "₹5 lakh" → 500000
+        """
+        import re
+        text = benefit_text.lower().replace(",", "")
+        
+        # Match patterns like ₹6000, Rs. 5000, ₹5 lakh, ₹1 crore
+        patterns = [
+            (r'₹\s*([\d.]+)\s*crore', 10_000_000),
+            (r'₹\s*([\d.]+)\s*lakh', 100_000),
+            (r'₹\s*([\d.]+)\s*l\b', 100_000),
+            (r'rs\.?\s*([\d.]+)\s*crore', 10_000_000),
+            (r'rs\.?\s*([\d.]+)\s*lakh', 100_000),
+            (r'₹\s*([\d.]+)', 1),
+            (r'rs\.?\s*([\d.]+)', 1),
+        ]
+        
+        max_value = 0.0
+        for pattern, multiplier in patterns:
+            matches = re.findall(pattern, text)
+            for m in matches:
+                try:
+                    val = float(m) * multiplier
+                    max_value = max(max_value, val)
+                except ValueError:
+                    pass
+        
+        return max_value
+
+    @staticmethod
     def score_and_rank(
         profile: CitizenProfile,
         schemes: list[Scheme],
@@ -210,6 +243,11 @@ class EligibilityEngine:
     ) -> list[SchemeRecommendation]:
         """
         Score all schemes against a profile and return ranked recommendations.
+
+        Ranking logic:
+        1. Primary sort: confidence score (descending)
+        2. Tie-break: benefit monetary value (descending)
+        3. Final tie-break: scheme name (alphabetical)
 
         Args:
             profile: Citizen profile with known attributes
@@ -236,8 +274,15 @@ class EligibilityEngine:
                     )
                 )
 
-        # Sort by confidence descending
-        recommendations.sort(key=lambda r: r.confidence, reverse=True)
+        # Sort: confidence desc → benefit value desc → name asc
+        recommendations.sort(
+            key=lambda r: (
+                r.confidence,
+                EligibilityEngine._extract_benefit_value(r.benefit),
+                -ord(r.scheme_name[0]) if r.scheme_name else 0,
+            ),
+            reverse=True,
+        )
         return recommendations
 
     @staticmethod

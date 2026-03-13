@@ -26,7 +26,7 @@ _in_memory_sessions: dict[str, dict] = {}
 
 
 def get_mongo_url() -> str:
-    return os.getenv("MONGODB_URL", "mongodb://localhost:27017")
+    return os.getenv("MONGODB_URL", "mongodb+srv://sandeepcodez24:23AD55%24anDeeP@mlappcluster1.ikzbjb0.mongodb.net/")
 
 
 def get_mongo_db_name() -> str:
