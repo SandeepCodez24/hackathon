@@ -1,0 +1,35 @@
+# GovScheme WhatsApp Chatbot — Python Dependencies
+# Phase 1: Foundation & Data Layer
+
+# Web framework
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+
+# Data validation
+pydantic==2.10.4
+
+# MongoDB async driver
+motor==3.7.0
+pymongo==4.10.1
+
+# Redis async
+redis==5.2.1
+
+# HTTP client (for WhatsApp API calls in Phase 3)
+httpx==0.28.1
+
+# YAML parsing (question bank)
+pyyaml==6.0.2
+
+# Environment variables
+python-dotenv==1.0.1
+
+# Testing
+pytest==8.3.4
+pytest-asyncio==0.24.0
+
+# CORS
+# (included in FastAPI)
+
+# Utilities
+python-multipart==0.0.19

@@ -1,0 +1,38 @@
+# GovScheme WhatsApp Chatbot — Docker Compose
+# One command startup: docker-compose up
+
+services:
+  backend:
+    build:
+      context: ../backend
+      dockerfile: ../infra/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGODB_URL=mongodb://mongo:27017
+      - MONGODB_DB_NAME=govscheme
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - mongo
+      - redis
+    volumes:
+      - ../backend:/app
+      - ../schemes_eligibility.json:/data/schemes_eligibility.json
+      - ../schemes_part2.json:/data/schemes_part2.json
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --maxmemory 100mb --maxmemory-policy allkeys-lru
+
+volumes:
+  mongo_data:
