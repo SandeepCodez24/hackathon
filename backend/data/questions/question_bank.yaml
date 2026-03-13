@@ -1,0 +1,246 @@
+# Question Bank — Adaptive questions for scheme eligibility assessment
+# These questions are ordered by information gain (highest discriminating power first)
+# Each question is tied to specific scheme eligibility fields
+
+metadata:
+  total_questions: 16
+  average_to_recommendation: 6-8
+  max_questions: 12
+  strategy: "information-gain-based selection — pick question that maximally prunes candidate schemes"
+
+questions:
+  - id: q_occupation
+    text: "What is your occupation?"
+    text_hi: "आपका व्यवसाय क्या है?"
+    field: occupation
+    type: choice
+    whatsapp_type: quick_reply
+    options:
+      - label: "Farmer"
+        label_hi: "किसान"
+        value: "Farmer"
+      - label: "Student"
+        label_hi: "छात्र"
+        value: "Student"
+      - label: "Self-employed"
+        label_hi: "स्वरोजगार"
+        value: "Self-employed"
+      - label: "Salaried / Govt Employee"
+        label_hi: "वेतनभोगी"
+        value: "Salaried"
+      - label: "Unemployed"
+        label_hi: "बेरोजगार"
+        value: "Unemployed"
+      - label: "Daily Wage Worker"
+        label_hi: "दिहाड़ी मज़दूर"
+        value: "Daily Wage Worker"
+      - label: "Business Owner"
+        label_hi: "व्यापारी"
+        value: "Business Owner"
+    discriminates:
+      - PMKISAN_003
+      - PMFBY_008
+      - PMMY_012
+      - MGNREGS_007
+      - PMSVANIDHI_026
+
+  - id: q_age
+    text: "What is your age?"
+    text_hi: "आपकी उम्र क्या है?"
+    field: age
+    type: range
+    whatsapp_type: quick_reply
+    options:
+      - label: "Below 18"
+        value: 16
+      - label: "18-25"
+        value: 22
+      - label: "26-35"
+        value: 30
+      - label: "36-45"
+        value: 40
+      - label: "46-60"
+        value: 53
+      - label: "Above 60"
+        value: 65
+
+  - id: q_gender
+    text: "What is your gender?"
+    text_hi: "आपका लिंग क्या है?"
+    field: gender
+    type: choice
+    whatsapp_type: quick_reply
+    options:
+      - label: "Male"
+        label_hi: "पुरुष"
+        value: "Male"
+      - label: "Female"
+        label_hi: "महिला"
+        value: "Female"
+      - label: "Other"
+        label_hi: "अन्य"
+        value: "Other"
+
+  - id: q_income
+    text: "What is your annual family income?"
+    text_hi: "आपकी वार्षिक पारिवारिक आय क्या है?"
+    field: annual_income
+    type: range
+    whatsapp_type: list
+    options:
+      - label: "Below ₹1 Lakh"
+        label_hi: "₹1 लाख से कम"
+        value: 80000
+      - label: "₹1-2 Lakh"
+        value: 150000
+      - label: "₹2-5 Lakh"
+        value: 350000
+      - label: "₹5-10 Lakh"
+        value: 750000
+      - label: "Above ₹10 Lakh"
+        label_hi: "₹10 लाख से ऊपर"
+        value: 1500000
+
+  - id: q_residence
+    text: "Do you live in a rural or urban area?"
+    text_hi: "आप ग्रामीण या शहरी क्षेत्र में रहते हैं?"
+    field: residence_type
+    type: choice
+    whatsapp_type: quick_reply
+    options:
+      - label: "Rural"
+        label_hi: "ग्रामीण"
+        value: "rural"
+      - label: "Urban"
+        label_hi: "शहरी"
+        value: "urban"
+
+  - id: q_state
+    text: "Which state do you live in?"
+    text_hi: "आप किस राज्य में रहते हैं?"
+    field: state
+    type: choice
+    whatsapp_type: list
+    options:
+      - { label: "Andhra Pradesh", value: "Andhra Pradesh" }
+      - { label: "Assam", value: "Assam" }
+      - { label: "Bihar", value: "Bihar" }
+      - { label: "Chhattisgarh", value: "Chhattisgarh" }
+      - { label: "Gujarat", value: "Gujarat" }
+      - { label: "Haryana", value: "Haryana" }
+      - { label: "Jharkhand", value: "Jharkhand" }
+      - { label: "Karnataka", value: "Karnataka" }
+      - { label: "Kerala", value: "Kerala" }
+      - { label: "Madhya Pradesh", value: "Madhya Pradesh" }
+      - { label: "Maharashtra", value: "Maharashtra" }
+      - { label: "Odisha", value: "Odisha" }
+      - { label: "Punjab", value: "Punjab" }
+      - { label: "Rajasthan", value: "Rajasthan" }
+      - { label: "Tamil Nadu", value: "Tamil Nadu" }
+      - { label: "Telangana", value: "Telangana" }
+      - { label: "Uttar Pradesh", value: "Uttar Pradesh" }
+      - { label: "West Bengal", value: "West Bengal" }
+      - { label: "Other", value: "Other" }
+
+  - id: q_caste
+    text: "What is your caste category?"
+    text_hi: "आपकी जाति श्रेणी क्या है?"
+    field: caste
+    type: choice
+    whatsapp_type: quick_reply
+    options:
+      - { label: "General", value: "General" }
+      - { label: "OBC", value: "OBC" }
+      - { label: "SC", value: "SC" }
+      - { label: "ST", value: "ST" }
+      - { label: "Minority", value: "Minority" }
+
+  - id: q_bpl
+    text: "Does your family hold a BPL card?"
+    text_hi: "क्या आपके परिवार के पास BPL कार्ड है?"
+    field: bpl_household
+    type: boolean
+    whatsapp_type: quick_reply
+    options:
+      - { label: "Yes", label_hi: "हाँ", value: true }
+      - { label: "No", label_hi: "नहीं", value: false }
+
+  - id: q_land
+    text: "Do you own agricultural land?"
+    text_hi: "क्या आपके पास कृषि भूमि है?"
+    field: owns_agricultural_land
+    type: boolean
+    whatsapp_type: quick_reply
+    options:
+      - { label: "Yes", value: true }
+      - { label: "No", value: false }
+
+  - id: q_tax_payer
+    text: "Are you an income tax payer?"
+    text_hi: "क्या आप आयकर दाता हैं?"
+    field: is_income_tax_payer
+    type: boolean
+    whatsapp_type: quick_reply
+    options:
+      - { label: "Yes", value: true }
+      - { label: "No", value: false }
+
+  - id: q_bank_account
+    text: "Do you have a bank account?"
+    text_hi: "क्या आपका बैंक खाता है?"
+    field: has_bank_account
+    type: boolean
+    whatsapp_type: quick_reply
+    options:
+      - { label: "Yes", value: true }
+      - { label: "No", value: false }
+
+  - id: q_aadhaar
+    text: "Is your bank account linked to Aadhaar?"
+    text_hi: "क्या आपका बैंक खाता आधार से जुड़ा है?"
+    field: aadhaar_linked
+    type: boolean
+    whatsapp_type: quick_reply
+    options:
+      - { label: "Yes", value: true }
+      - { label: "No", value: false }
+
+  - id: q_house
+    text: "Do you own a pucca (permanent) house?"
+    text_hi: "क्या आपके पास पक्का मकान है?"
+    field: owns_pucca_house
+    type: boolean
+    whatsapp_type: quick_reply
+    options:
+      - { label: "Yes", value: true }
+      - { label: "No", value: false }
+
+  - id: q_girl_child
+    text: "Do you have a girl child (below 10 years)?"
+    text_hi: "क्या आपकी 10 वर्ष से कम उम्र की बेटी है?"
+    field: has_girl_child
+    type: boolean
+    whatsapp_type: quick_reply
+    options:
+      - { label: "Yes", value: true }
+      - { label: "No", value: false }
+
+  - id: q_disability
+    text: "Do you or a family member have a disability?"
+    text_hi: "क्या आपको या परिवार के किसी सदस्य को विकलांगता है?"
+    field: has_disability
+    type: boolean
+    whatsapp_type: quick_reply
+    options:
+      - { label: "Yes", value: true }
+      - { label: "No", value: false }
+
+  - id: q_pregnant
+    text: "Are you or a family member currently pregnant or lactating?"
+    text_hi: "क्या आप या परिवार की कोई सदस्य गर्भवती हैं?"
+    field: is_pregnant_or_lactating
+    type: boolean
+    whatsapp_type: quick_reply
+    options:
+      - { label: "Yes", value: true }
+      - { label: "No", value: false }
