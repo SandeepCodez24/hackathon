@@ -1,0 +1,636 @@
+[
+    {
+      "id": "ESHRAM_027",
+      "name": "e-Shram Portal",
+      "ministry": "Ministry of Labour and Employment",
+      "type": "central",
+      "category": "Unorganised Worker Registration",
+      "portal_url": "https://eshram.gov.in",
+      "benefit": "UAN card, ₹2 lakh accident insurance under PMSBY, access to social security schemes",
+      "eligibility": {
+        "age": { "min": 16, "max": 59 },
+        "sector": "Unorganised worker (not member of EPFO/ESIC)",
+        "examples": ["Construction workers","Domestic workers","Street vendors","Agricultural labourers","Auto/taxi drivers","Migrant workers"],
+        "documents_required": ["Aadhaar Card","Bank account","Mobile linked to Aadhaar"]
+      },
+      "eligibility_rules": {
+        "age_min": 16, "age_max": 59,
+        "is_epfo_esic_member": false,
+        "sector": "unorganised"
+      },
+      "application_steps": [
+        "Visit eshram.gov.in or nearest CSC",
+        "Self-register with Aadhaar and mobile OTP",
+        "Fill occupation and bank details",
+        "Download UAN (Universal Account Number) e-Shram card instantly"
+      ]
+    },
+    {
+      "id": "NRLM_028",
+      "name": "National Rural Livelihood Mission (NRLM / Aajeevika)",
+      "ministry": "Ministry of Rural Development",
+      "type": "central",
+      "category": "Rural Livelihood / Women SHGs",
+      "portal_url": "https://aajeevika.gov.in",
+      "benefit": "Revolving fund ₹15,000/SHG, CIF capital subsidy, bank linkage, skill & placement support",
+      "eligibility": {
+        "target": "Rural poor women",
+        "residence": "Rural",
+        "gender": "Primarily women",
+        "group_size": "10–20 members form a Self Help Group",
+        "income": "BPL or near-poor",
+        "documents_required": ["Aadhaar Card","Ration Card","Bank account"]
+      },
+      "eligibility_rules": {
+        "residence_type": "rural",
+        "gender": "female",
+        "bpl_or_near_poor": true
+      },
+      "application_steps": [
+        "Contact nearest NRLM resource person / Gram Panchayat",
+        "Women form Self Help Group (SHG) of 10–20 members",
+        "SHG registered and bank account opened",
+        "Revolving fund ₹15,000 credited after 3-month track record",
+        "Capital fund and bank linkage provided subsequently"
+      ]
+    },
+    {
+      "id": "NAMAMI_GANGE_029",
+      "name": "Namami Gange Programme",
+      "ministry": "Ministry of Jal Shakti",
+      "type": "central",
+      "category": "River Conservation / Environment",
+      "portal_url": "https://namamigange.in",
+      "benefit": "Sewage treatment, ghats/crematoria development, rural sanitation, biodiversity conservation along Ganga",
+      "eligibility": {
+        "target": "Communities, ULBs, Gram Panchayats on Ganga river basin",
+        "states": ["Uttarakhand","Uttar Pradesh","Bihar","Jharkhand","West Bengal"],
+        "note": "Infrastructure/environmental scheme; benefits flow to communities automatically"
+      },
+      "eligibility_rules": {
+        "residence_in_ganga_basin": true
+      },
+      "application_steps": [
+        "Communities / ULBs apply for Namami Gange projects through NMCG",
+        "Proposals submitted at nmcg.nic.in",
+        "Citizens report pollution incidents via Namami Gange app"
+      ]
+    },
+    {
+      "id": "BHARATNET_030",
+      "name": "BharatNet",
+      "ministry": "Ministry of Communications",
+      "type": "central",
+      "category": "Rural Internet Connectivity",
+      "portal_url": "https://bharatnet.gov.in",
+      "benefit": "High-speed broadband connectivity to all Gram Panchayats; affordable internet access",
+      "eligibility": {
+        "target": "All Gram Panchayats in India",
+        "beneficiaries": "Rural citizens, government institutions, schools, health centres",
+        "note": "Infrastructure scheme; individual access via installed wifi hotspots at GP"
+      },
+      "eligibility_rules": {
+        "residence_type": "rural"
+      },
+      "application_steps": [
+        "BharatNet hotspot installed by BSNL at Gram Panchayat office",
+        "Citizens connect via wifi using voucher or OTP-based login",
+        "Services available at Gram Panchayat / CSC level"
+      ]
+    },
+    {
+      "id": "PLI_031",
+      "name": "Production Linked Incentive (PLI) Scheme",
+      "ministry": "Ministry of Commerce (DPIIT) / Sector Ministries",
+      "type": "central",
+      "category": "Manufacturing / Industry",
+      "portal_url": "https://dpiit.gov.in/pli-schemes",
+      "benefit": "Incentives of 4–20% on incremental sales from base year for 5 years across 14 sectors",
+      "eligibility": {
+        "applicant_type": "Manufacturers / Companies",
+        "sectors": ["Mobile & Electronic components","Pharmaceuticals","Medical devices","Auto & Auto components","Telecom","Textile","Food processing","Solar PV","White goods","Specialty steel","Battery storage","Drones","Animation"],
+        "conditions": ["Minimum investment thresholds vary by sector","Incremental sales above base year required"],
+        "documents_required": ["Company registration","GST registration","Audited financials","Project proposal"]
+      },
+      "eligibility_rules": {
+        "entity_type": "company_or_manufacturer",
+        "sector": "manufacturing"
+      },
+      "application_steps": [
+        "Apply through respective sector ministry portal",
+        "Submit investment plan and financial details",
+        "Ministry reviews and issues approval",
+        "Incentive disbursed annually based on incremental sales"
+      ]
+    },
+    {
+      "id": "NFSM_032",
+      "name": "National Food Security Mission (NFSM)",
+      "ministry": "Ministry of Agriculture & Farmers Welfare",
+      "type": "central",
+      "category": "Agriculture / Crop Production",
+      "portal_url": "https://nfsm.gov.in",
+      "benefit": "Subsidised seeds, fertilisers, farm equipment; demonstrations and training for rice, wheat, pulses, oilseeds",
+      "eligibility": {
+        "target": "Farmers in selected districts growing target crops",
+        "crops_covered": ["Rice","Wheat","Pulses","Coarse cereals","Oilseeds","Cotton"],
+        "residence": "Farmers in NFSM-selected districts",
+        "documents_required": ["Aadhaar Card","Land records","Bank account"]
+      },
+      "eligibility_rules": {
+        "occupation": "farmer",
+        "district_nfsm_selected": true
+      },
+      "application_steps": [
+        "Contact District Agriculture Office or Krishi Vigyan Kendra",
+        "Register as NFSM beneficiary with land records",
+        "Receive subsidised inputs (seeds, fertiliser, tools)",
+        "Participate in farm demonstrations and training"
+      ]
+    },
+    {
+      "id": "RASHTRIYA_GOKUL_033",
+      "name": "Rashtriya Gokul Mission",
+      "ministry": "Ministry of Fisheries, Animal Husbandry and Dairying",
+      "type": "central",
+      "category": "Animal Husbandry / Dairy",
+      "portal_url": "https://dahd.nic.in",
+      "benefit": "Genetic upgradation of indigenous cattle, artificial insemination services, breed improvement support",
+      "eligibility": {
+        "target": "Cattle/buffalo owners, dairy farmers, cooperatives",
+        "residence": "All India",
+        "documents_required": ["Aadhaar Card","Land/livestock records","Bank account"]
+      },
+      "eligibility_rules": {
+        "occupation": "dairy_farmer_or_cattle_owner"
+      },
+      "application_steps": [
+        "Contact State Animal Husbandry Department",
+        "Register with nearest Gokul Gram or progressive farmer network",
+        "Avail free or subsidised artificial insemination services",
+        "Access breed improvement and veterinary support"
+      ]
+    },
+    {
+      "id": "WHITE_REVOLUTION_034",
+      "name": "White Revolution – National Programme for Dairy Development (NPDD)",
+      "ministry": "Ministry of Fisheries, Animal Husbandry and Dairying",
+      "type": "central",
+      "category": "Dairy Development",
+      "portal_url": "https://dahd.nic.in",
+      "benefit": "Milk processing infrastructure, cold chain, cooperative strengthening; milk yield enhancement",
+      "eligibility": {
+        "target": "Dairy cooperatives, milk unions, farmer producer organisations, dairy farmers",
+        "documents_required": ["Aadhaar Card","Milk cooperative membership proof","Bank account"]
+      },
+      "eligibility_rules": {
+        "occupation": "dairy_farmer",
+        "is_dairy_cooperative_member": true
+      },
+      "application_steps": [
+        "Join nearest dairy cooperative society",
+        "Cooperative applies for NPDD funding to NDDB / state agency",
+        "Benefits flow through cooperative to member farmers"
+      ]
+    },
+    {
+      "id": "BLUE_REVOLUTION_035",
+      "name": "Blue Revolution – Pradhan Mantri Matsya Sampada Yojana (PMMSY)",
+      "ministry": "Ministry of Fisheries, Animal Husbandry and Dairying",
+      "type": "central",
+      "category": "Fisheries Development",
+      "portal_url": "https://pmmsy.dof.gov.in",
+      "benefit": "Subsidy 40–60% for fisheries infrastructure; fish hatcheries, aquaculture, boats, cold storage, processing units",
+      "eligibility": {
+        "target": ["Fishermen","Fish farmers","SHGs involved in fisheries","Fish processing units","Cooperatives"],
+        "categories_and_subsidy": {
+          "SC_ST_women": "60% subsidy",
+          "general": "40% subsidy"
+        },
+        "documents_required": ["Aadhaar Card","Fisherman ID / Boat registration","Land / water body lease documents","Bank account","Project proposal"]
+      },
+      "eligibility_rules": {
+        "occupation": "fisherman_or_fish_farmer"
+      },
+      "application_steps": [
+        "Apply at pmmsy.dof.gov.in or nearest Fisheries Department",
+        "Submit project proposal with cost estimates",
+        "Approval by state fisheries department",
+        "Subsidy released in instalments upon project completion"
+      ]
+    },
+    {
+      "id": "AMRUT_036",
+      "name": "AMRUT (Atal Mission for Rejuvenation and Urban Transformation)",
+      "ministry": "Ministry of Housing and Urban Affairs",
+      "type": "central",
+      "category": "Urban Infrastructure",
+      "portal_url": "https://amrut.gov.in",
+      "benefit": "Water supply, sewerage, storm water drains, green spaces, and urban transport in cities",
+      "eligibility": {
+        "target": "Citizens in AMRUT cities (500 selected cities with population > 1 lakh)",
+        "note": "Government infrastructure scheme; no individual application required"
+      },
+      "eligibility_rules": {
+        "residence_type": "urban",
+        "city_amrut_selected": true
+      },
+      "application_steps": [
+        "ULBs prepare Service Level Improvement Plans (SLIP)",
+        "State Annual Action Plans submitted to MoHUA",
+        "Projects sanctioned and implemented by ULB",
+        "Citizens benefit through improved infrastructure"
+      ]
+    },
+    {
+      "id": "SMART_CITIES_037",
+      "name": "Smart Cities Mission",
+      "ministry": "Ministry of Housing and Urban Affairs",
+      "type": "central",
+      "category": "Urban Development",
+      "portal_url": "https://smartcities.gov.in",
+      "benefit": "Smart infrastructure, digital services, integrated command centres, improved urban services in 100 smart cities",
+      "eligibility": {
+        "target": "Citizens of 100 selected Smart Cities",
+        "note": "Infrastructure scheme; residents benefit automatically from improved city services"
+      },
+      "eligibility_rules": {
+        "residence_type": "urban",
+        "city_smart_cities_selected": true
+      },
+      "application_steps": [
+        "Cities compete and get selected under Smart Cities Mission",
+        "Smart City SPV implements projects",
+        "Citizens access smart services (digital payments, smart parking, integrated apps)"
+      ]
+    },
+    {
+      "id": "SAANSAD_ADARSH_GRAM_038",
+      "name": "Saansad Adarsh Gram Yojana (SAGY)",
+      "ministry": "Ministry of Rural Development",
+      "type": "central",
+      "category": "Village Development",
+      "portal_url": "https://saanjhi.gov.in",
+      "benefit": "Holistic development of identified villages: infrastructure, livelihood, education, health",
+      "eligibility": {
+        "target": "Residents of Gram Panchayats adopted by Members of Parliament",
+        "note": "Village adopted by MP; residents benefit automatically through convergence of schemes"
+      },
+      "eligibility_rules": {
+        "residence_type": "rural",
+        "village_adopted_by_mp": true
+      },
+      "application_steps": [
+        "MP identifies and adopts a Gram Panchayat",
+        "Village Development Plan prepared with community participation",
+        "Existing government schemes converged for the village",
+        "Residents access all schemes through village Panchayat"
+      ]
+    },
+    {
+      "id": "ONE_NATION_ONE_SUBSCRIPTION_039",
+      "name": "One Nation One Subscription (ONOS)",
+      "ministry": "Ministry of Education",
+      "type": "central",
+      "category": "Education / Research",
+      "portal_url": "https://onos.inflibnet.ac.in",
+      "benefit": "Access to 13,000+ international journals for all government higher education and research institutions",
+      "eligibility": {
+        "target": "Students and faculty/researchers in government higher education institutions",
+        "institutions": "All central/state government colleges, universities, research institutions",
+        "note": "Access through institutional login; no individual registration required"
+      },
+      "eligibility_rules": {
+        "enrolled_in_govt_institution": true,
+        "education_level": "higher_education_or_research"
+      },
+      "application_steps": [
+        "Institution enrolls in ONOS through INFLIBNET",
+        "Students/faculty access journals via institutional IP or VPN",
+        "No individual cost to students"
+      ]
+    },
+    {
+      "id": "DIVYANG_KAUSHAL_040",
+      "name": "Divyang Kaushal Yojana (National Action for Mechanised Sanitation Ecosystem)",
+      "ministry": "Ministry of Skill Development and Entrepreneurship",
+      "type": "central",
+      "category": "Skill Development for Differently Abled",
+      "portal_url": "https://www.msde.gov.in",
+      "benefit": "Free skill training and certification for persons with disabilities; placement assistance",
+      "eligibility": {
+        "target": "Persons with disabilities (PwD)",
+        "disability_certificate": "Required (at least 40% disability)",
+        "age": { "min": 14 },
+        "documents_required": ["Aadhaar Card","Disability certificate","Educational certificates (if any)","Bank account"]
+      },
+      "eligibility_rules": {
+        "has_disability": true,
+        "disability_pct_min": 40,
+        "age_min": 14
+      },
+      "application_steps": [
+        "Visit nearest PMKVY or NSDC training centre with PwD facility",
+        "Submit disability certificate and Aadhaar",
+        "Enrol in preferred accessible skill course",
+        "Complete training and appear for sector skill council assessment",
+        "Receive NSQF certificate and placement support"
+      ]
+    },
+    {
+      "id": "NATIONAL_APPRENTICESHIP_041",
+      "name": "National Apprenticeship Promotion Scheme (NAPS)",
+      "ministry": "Ministry of Skill Development and Entrepreneurship",
+      "type": "central",
+      "category": "Apprenticeship / On-Job Training",
+      "portal_url": "https://apprenticeshipindia.org",
+      "benefit": "Government shares 25% of stipend (max ₹1,500/month) with employer; NATS provides apprenticeship stipend directly",
+      "eligibility": {
+        "apprentice_age": { "min": 14 },
+        "education": "Minimum 5th standard pass; qualification varies by trade",
+        "applicant_type": "Fresher seeking on-job technical training",
+        "documents_required": ["Aadhaar Card","Educational certificates","Bank account"]
+      },
+      "eligibility_rules": {
+        "age_min": 14,
+        "education_min": "5th_standard"
+      },
+      "application_steps": [
+        "Register at apprenticeshipindia.org or nats.education.gov.in",
+        "Search for apprenticeship opportunities by trade and location",
+        "Apply to employer; employer engages apprentice",
+        "Stipend received monthly; certificate issued on completion"
+      ]
+    },
+    {
+      "id": "NATIONAL_MEANS_MERIT_042",
+      "name": "National Means cum Merit Scholarship Scheme (NMMSS)",
+      "ministry": "Ministry of Education",
+      "type": "central",
+      "category": "Education Scholarship",
+      "portal_url": "https://scholarships.gov.in",
+      "benefit": "₹12,000 per year scholarship for meritorious students from economically weaker sections",
+      "eligibility": {
+        "class": "Students in Class 8 (selection) continuing to Class 12",
+        "parental_income": { "max": 150000, "note": "Annual income of parents ≤ ₹1.5 lakh" },
+        "exam": "Must qualify National Means cum Merit Scholarship Exam (NMMS Exam) in Class 8",
+        "minimum_marks": "At least 55% in Class 7 (50% for SC/ST)",
+        "school_type": "Government or government-aided school",
+        "documents_required": ["Aadhaar Card","Income certificate","Class 7 marksheet","Bank account","NMMS admit card"]
+      },
+      "eligibility_rules": {
+        "class": "8th_applying",
+        "annual_parental_income_max": 150000,
+        "school_type": "government_or_aided",
+        "class7_marks_pct_min": 55
+      },
+      "application_steps": [
+        "Appear for NMMS Exam in Class 8 (conducted by state)",
+        "Apply at scholarships.gov.in after qualifying",
+        "Submit income certificate, marksheets, bank details",
+        "Scholarship renewed annually on maintaining 55% marks"
+      ]
+    },
+    {
+      "id": "ATL_ATAL_INNOVATION_043",
+      "name": "Atal Innovation Mission (AIM) / Atal Tinkering Labs",
+      "ministry": "NITI Aayog",
+      "type": "central",
+      "category": "Innovation / Startup Ecosystem",
+      "portal_url": "https://aim.gov.in",
+      "benefit": "₹20 lakh grant for Atal Tinkering Labs in schools; startup incubation support via Atal Incubation Centres",
+      "eligibility": {
+        "ATL": {
+          "target": "Schools (Grade 6–12) in India",
+          "school_type": "Govt / govt-aided / private recognised schools",
+          "condition": "Must have dedicated space for lab and STEM experiments"
+        },
+        "AIC": {
+          "target": "Academic institutions / NGOs / companies setting up incubators",
+          "funding": "Up to ₹10 crore grant"
+        }
+      },
+      "eligibility_rules": {
+        "entity_type": "school_or_institution"
+      },
+      "application_steps": [
+        "Schools apply at aim.gov.in for ATL grant",
+        "Submit application with CBSE registration and space details",
+        "AIM evaluates and approves (grant of ₹20 lakh over 5 years)",
+        "Lab set up with equipment for robotics, IoT, 3D printing etc."
+      ]
+    },
+    {
+      "id": "GREEN_REVOLUTION_044",
+      "name": "Green Revolution – RAFTAAR (Bringing Green Revolution to Eastern India)",
+      "ministry": "Ministry of Agriculture & Farmers Welfare",
+      "type": "central",
+      "category": "Agriculture / Crop Productivity",
+      "portal_url": "https://agricoop.gov.in",
+      "benefit": "Subsidised seeds, fertilisers, modern farm equipment; cluster demonstrations; irrigation support",
+      "eligibility": {
+        "target": "Farmers in eastern India states (WB, Odisha, Bihar, Jharkhand, Eastern UP, Chhattisgarh, Assam)",
+        "crops": ["Rice","Wheat","Pulses","Oilseeds"],
+        "documents_required": ["Aadhaar Card","Land records","Bank account"]
+      },
+      "eligibility_rules": {
+        "occupation": "farmer",
+        "state": ["West Bengal","Odisha","Bihar","Jharkhand","Uttar Pradesh","Chhattisgarh","Assam"]
+      },
+      "application_steps": [
+        "Contact District Agriculture Office",
+        "Register as beneficiary with land and Aadhaar details",
+        "Receive subsidised inputs and participate in demonstrations"
+      ]
+    },
+    {
+      "id": "PMMSY_FISHERIES_045",
+      "name": "Reservoir Development Scheme (PMMSY – Inland Fisheries)",
+      "ministry": "Ministry of Fisheries, Animal Husbandry and Dairying",
+      "type": "central",
+      "category": "Inland Fisheries",
+      "portal_url": "https://pmmsy.dof.gov.in",
+      "benefit": "Development of reservoirs for inland fishery; cage culture support; subsidy for fishermen",
+      "eligibility": {
+        "target": "Inland fishermen, fish farmers using reservoirs/ponds/lakes",
+        "subsidy": "40% general / 60% for SC/ST and women",
+        "documents_required": ["Aadhaar Card","Fisherman ID","Water body lease / permission","Bank account"]
+      },
+      "eligibility_rules": {
+        "occupation": "inland_fisherman"
+      },
+      "application_steps": [
+        "Apply at state Fisheries Department or pmmsy.dof.gov.in",
+        "Submit lease documents and project proposal",
+        "Approval and subsidy disbursed post implementation"
+      ]
+    },
+    {
+      "id": "SHE_MARTS_046",
+      "name": "SHE-Marts (Self Help Group Empowerment Market)",
+      "ministry": "Ministry of Rural Development (NRLM)",
+      "type": "central",
+      "category": "Women SHG Market Linkage",
+      "portal_url": "https://aajeevika.gov.in",
+      "benefit": "Physical and digital marketplace for SHG products; marketing and branding support",
+      "eligibility": {
+        "target": "Women Self Help Groups (SHGs) under NRLM/DAY-NRLM",
+        "condition": "SHG must be active member of NRLM/Aajeevika programme",
+        "documents_required": ["SHG registration certificate","Bank account of SHG","NRLM membership proof"]
+      },
+      "eligibility_rules": {
+        "is_nrlm_shg_member": true,
+        "gender": "female"
+      },
+      "application_steps": [
+        "Active NRLM SHG registers product details with State Rural Livelihood Mission",
+        "Products listed on national and state SHE-Mart platforms",
+        "SHG products sold through government e-marketplace and physical marts"
+      ]
+    },
+    {
+      "id": "BHARAT_VISTAAR_047",
+      "name": "Bharat VISTAAR (Village & Integrated Space Technology for Agri-Rural growth)",
+      "ministry": "Ministry of Agriculture & Farmers Welfare",
+      "type": "central",
+      "category": "Agriculture / Digital Agri Services",
+      "portal_url": "https://agricoop.gov.in",
+      "benefit": "Digital agriculture services, AI/satellite-based crop advisory, soil health, weather alerts via village-level kiosks",
+      "eligibility": {
+        "target": "Farmers in selected villages / blocks",
+        "documents_required": ["Aadhaar Card","Land records","Mobile number"]
+      },
+      "eligibility_rules": {
+        "occupation": "farmer"
+      },
+      "application_steps": [
+        "Contact nearest Krishi Vigyan Kendra or Agriculture department",
+        "Register mobile number for crop advisory alerts",
+        "Access digital agri services through village kiosk or app"
+      ]
+    },
+    {
+      "id": "PM_POSHAN_048",
+      "name": "PM Poshan Shakti Nirman (Mid-Day Meal Scheme)",
+      "ministry": "Ministry of Education",
+      "type": "central",
+      "category": "School Nutrition",
+      "portal_url": "https://pmposhan.education.gov.in",
+      "benefit": "Free hot cooked meals to school children; ≥450 calories and 12g protein (primary), ≥700 cal & 20g protein (upper primary)",
+      "eligibility": {
+        "target": "Students enrolled in Classes 1–8 in government and government-aided schools",
+        "residence": "All India",
+        "auto_benefit": true,
+        "documents_required": ["School enrolment / admission record"]
+      },
+      "eligibility_rules": {
+        "enrolled_in_govt_school": true,
+        "class_range": "1_to_8"
+      },
+      "application_steps": [
+        "Automatic benefit for all enrolled students in government / aided schools",
+        "No separate application required",
+        "Meals served on all school working days"
+      ]
+    },
+    {
+      "id": "PMSSY_049",
+      "name": "Pradhan Mantri Swasthya Suraksha Yojana (PMSSY)",
+      "ministry": "Ministry of Health and Family Welfare",
+      "type": "central",
+      "category": "Health Infrastructure",
+      "portal_url": "https://pmssy.mohfw.gov.in",
+      "benefit": "AIIMS-like institutions and upgradation of existing govt medical colleges in underserved states",
+      "eligibility": {
+        "target": "Citizens in states with inadequate tertiary healthcare (primarily underserved states)",
+        "note": "Infrastructure scheme; patients access improved healthcare at upgraded government hospitals",
+        "states_benefited": ["Uttarakhand","Himachal Pradesh","Bihar","Chhattisgarh","Madhya Pradesh","Odisha","Rajasthan","Jharkhand","Uttar Pradesh","West Bengal","Andhra Pradesh","Assam","Tripura","Manipur"]
+      },
+      "eligibility_rules": {
+        "state": "underserved_states"
+      },
+      "application_steps": [
+        "Citizens access healthcare at newly set-up AIIMS or upgraded medical colleges",
+        "OPD and IPD services at government rates",
+        "No individual application required"
+      ]
+    },
+    {
+      "id": "PMKSY_050",
+      "name": "Pradhan Mantri Krishi Sinchai Yojana (PMKSY)",
+      "ministry": "Ministry of Agriculture & Farmers Welfare / Jal Shakti",
+      "type": "central",
+      "category": "Irrigation",
+      "portal_url": "https://pmksy.gov.in",
+      "benefit": "55% subsidy (45% for general) on drip/sprinkler irrigation; 'Har Khet Ko Pani' – water to every farm",
+      "eligibility": {
+        "target": "Farmers with agricultural land",
+        "sub_scheme_PDMC": {
+          "name": "Per Drop More Crop",
+          "subsidy": "55% for SC/ST/small/marginal; 45% for general",
+          "conditions": ["Farmer must own or lease agricultural land","Minimum specified land area for application"]
+        },
+        "documents_required": ["Aadhaar Card","Land records","Bank account","Irrigation project estimate"]
+      },
+      "eligibility_rules": {
+        "occupation": "farmer",
+        "owns_agricultural_land": true
+      },
+      "application_steps": [
+        "Apply at State Agriculture Department or pmksy.gov.in",
+        "Submit land records and drip/sprinkler installation estimate",
+        "Approval and physical verification by agriculture officer",
+        "Subsidy credited to bank account post installation"
+      ]
+    },
+    {
+      "id": "KALA_SANSKRITI_051",
+      "name": "Kala Sanskriti Vikas Yojana",
+      "ministry": "Ministry of Culture",
+      "type": "central",
+      "category": "Arts & Culture",
+      "portal_url": "https://indiaculture.gov.in",
+      "benefit": "Financial assistance for performing arts, craft development, cultural heritage promotion and events",
+      "eligibility": {
+        "target": ["Individual artists","Cultural organisations","Art troupes"],
+        "conditions": ["Registered cultural organisation or recognised artist","Indian citizen"],
+        "documents_required": ["Aadhaar Card","Artist registration / organisation certificate","Portfolio / samples of work","Bank account"]
+      },
+      "eligibility_rules": {
+        "is_artist_or_cultural_org": true,
+        "nationality": "Indian"
+      },
+      "application_steps": [
+        "Apply online at indiaculture.gov.in",
+        "Submit application with portfolio and project proposal",
+        "Ministry committee review and approval",
+        "Grant disbursed to bank account"
+      ]
+    },
+    {
+      "id": "PMJAY_70PLUS_052",
+      "name": "Ayushman Bharat – AB PM-JAY for 70+ Senior Citizens",
+      "ministry": "Ministry of Health and Family Welfare",
+      "type": "central",
+      "category": "Health Insurance – Senior Citizens",
+      "portal_url": "https://pmjay.gov.in",
+      "benefit": "Health coverage ₹5 lakh/year per individual for all senior citizens aged 70+; includes existing PMJAY beneficiaries",
+      "eligibility": {
+        "age": { "min": 70 },
+        "nationality": "Indian citizen",
+        "income": "No income restriction (universal for 70+)",
+        "valid_from": "12 September 2024",
+        "documents_required": ["Aadhaar Card","Age proof (birth certificate / voter ID)"]
+      },
+      "eligibility_rules": {
+        "age_min": 70,
+        "nationality": "Indian"
+      },
+      "application_steps": [
+        "Visit pmjay.gov.in or nearest Ayushman Mitra / CSC",
+        "Submit Aadhaar and age proof",
+        "Ayushman Vaya Vandana Card issued",
+        "Use card at any empanelled hospital for cashless treatment"
+      ]
+    }
+  ]
