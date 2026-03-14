@@ -27,6 +27,9 @@ from app.core.whatsapp_formatter import (
     should_use_list,
 )
 from app.core.voice_transcriber import transcribe_voice
+from app.core.language_handler import detect_language_from_text, get_welcome_message
+from app.core.fraud_detector import check_fraud, get_fraud_flag_message
+from app.core.llm_client import detect_language, generate_apply_guide
 from app.db.scheme_orm import get_all_schemes, get_scheme_by_id
 from app.models.session import SessionState
 
@@ -173,17 +176,24 @@ async def handle_conversation(phone: str, text: str, msg_type: str, raw_msg: dic
         return
 
     # ---- GREETING state: Start/restart ----
-    if text_upper in ("HI", "HELLO", "START", "NAMASTE", "हाँ", "शुरू") or \
+    if text_upper in ("HI", "HELLO", "START", "NAMASTE", "हाँ", "शुरू", "HAI", "HEY") or \
        text_upper == "CMD_START" or session.state == SessionState.GREETING:
+
+        # Detect language from first message
+        detected_lang = detect_language_from_text(text)
+        if detected_lang == "en":
+            detected_lang = await detect_language(text)  # LLM fallback for romanised Hindi
 
         # Reset session for fresh start
         await SessionManager.delete(session_id)
         session = await SessionManager.get_or_create(session_id, channel="whatsapp")
+        session.language = detected_lang
         session.state = SessionState.QUESTIONING
         await SessionManager.save(session)
 
-        # Send welcome
-        await WhatsAppClient.send_text(phone, format_welcome_message(session.language))
+        # Send language-aware welcome
+        welcome = get_welcome_message(detected_lang)
+        await WhatsAppClient.send_text(phone, welcome)
 
         # Send first question using info gain
         all_schemes = await get_all_schemes()
@@ -211,7 +221,14 @@ async def handle_conversation(phone: str, text: str, msg_type: str, raw_msg: dic
                 if scheme:
                     session.state = SessionState.APPLY_GUIDE
                     await SessionManager.save(session)
-                    guide = format_apply_guide(scheme.model_dump(), session.language)
+
+                    # Use LLM for personalised guide (falls back to static)
+                    guide = await generate_apply_guide(
+                        scheme.name,
+                        scheme.apply_steps or [],
+                        scheme.documents or [],
+                        session.language,
+                    )
                     await WhatsAppClient.send_text(phone, guide)
 
                     # Send link button if portal URL exists
@@ -219,7 +236,7 @@ async def handle_conversation(phone: str, text: str, msg_type: str, raw_msg: dic
                         await WhatsAppClient.send_link_button(
                             phone,
                             f"Apply for {scheme.name}",
-                            "Apply Now",
+                            "Apply Now 🔗",
                             scheme.portal_url,
                         )
                     return
@@ -298,6 +315,12 @@ async def _process_answer(phone: str, text: str, session):
     candidate_schemes = [s for s in all_schemes if s.id in session.candidates]
 
     if session.is_complete() or len(candidate_schemes) <= 5:
+        # ── Fraud check (Phase 5) ─────────────────────────────────────────────
+        is_suspicious, risk_score, rules_triggered = check_fraud(session.profile)
+        if is_suspicious:
+            logger.warning(f"🚩 Fraud flag for {phone}: score={risk_score}, rules={rules_triggered}")
+            await WhatsAppClient.send_text(phone, get_fraud_flag_message(session.language))
+
         # Generate recommendations
         session.recommendations = EligibilityEngine.score_and_rank(
             session.profile, candidate_schemes, min_confidence=20.0
