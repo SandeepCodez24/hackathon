@@ -1,8 +1,3 @@
-"""
-Voice Transcriber — OpenAI Whisper API integration.
-Transcribes WhatsApp voice notes to text for low-literacy users.
-"""
-
 import os
 import logging
 import httpx
@@ -11,7 +6,6 @@ from typing import Optional
 logger = logging.getLogger(__name__)
 
 GRAPH_API_VERSION = "v21.0"
-
 
 async def download_whatsapp_media(media_id: str) -> bytes:
     """
@@ -22,7 +16,7 @@ async def download_whatsapp_media(media_id: str) -> bytes:
     headers = {"Authorization": f"Bearer {token}"}
 
     async with httpx.AsyncClient(timeout=30.0) as client:
-        # Step 1: Get download URL
+
         url_resp = await client.get(
             f"https://graph.facebook.com/{GRAPH_API_VERSION}/{media_id}",
             headers=headers,
@@ -31,10 +25,8 @@ async def download_whatsapp_media(media_id: str) -> bytes:
         if not media_url:
             raise ValueError(f"Could not get media URL for {media_id}")
 
-        # Step 2: Download binary
         media_resp = await client.get(media_url, headers=headers)
         return media_resp.content
-
 
 async def transcribe_voice(media_id: str) -> str:
     """
@@ -54,11 +46,10 @@ async def transcribe_voice(media_id: str) -> str:
         return "[Voice note received — transcription unavailable]"
 
     try:
-        # Download audio from WhatsApp
+
         audio_bytes = await download_whatsapp_media(media_id)
         logger.info(f"Downloaded voice note: {len(audio_bytes)} bytes")
 
-        # Send to Whisper API
         async with httpx.AsyncClient(timeout=30.0) as client:
             resp = await client.post(
                 "https://api.openai.com/v1/audio/transcriptions",
@@ -78,7 +69,6 @@ async def transcribe_voice(media_id: str) -> str:
     except Exception as e:
         logger.error(f"Voice transcription error: {e}")
         return "[Voice note transcription failed]"
-
 
 async def transcribe_audio_bytes(audio_bytes: bytes, filename: str = "voice.ogg") -> str:
     """

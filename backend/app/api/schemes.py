@@ -1,15 +1,9 @@
-"""
-Scheme Catalogue REST API.
-Endpoints: GET /api/schemes, GET /api/schemes/{id}, GET /api/schemes/categories
-"""
-
 from fastapi import APIRouter, HTTPException, Query
 from typing import Optional
 from app.db.scheme_orm import get_all_schemes, get_scheme_by_id, filter_schemes, get_scheme_categories
 from app.models.scheme import Scheme, SchemeListResponse
 
 router = APIRouter(prefix="/api/schemes", tags=["schemes"])
-
 
 @router.get("", response_model=SchemeListResponse)
 async def list_schemes(
@@ -34,12 +28,10 @@ async def list_schemes(
 
     return SchemeListResponse(total=len(schemes), schemes=schemes)
 
-
 @router.get("/categories", response_model=list[str])
 async def list_categories():
     """Get all unique scheme categories."""
     return await get_scheme_categories()
-
 
 @router.get("/{scheme_id}", response_model=Scheme)
 async def get_scheme(scheme_id: str):

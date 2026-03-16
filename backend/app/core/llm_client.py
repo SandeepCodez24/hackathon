@@ -1,11 +1,3 @@
-"""
-LLM Client — Phase 4
-Claude/GPT-4 API wrapper for natural language generation.
-Generates: scheme explanations, "why recommended", personalised apply guides,
-           language-aware questions, and follow-up responses.
-Gracefully degrades to rule-based fallback if no API key is set.
-"""
-
 import os
 import logging
 from typing import Optional
@@ -15,9 +7,8 @@ log = logging.getLogger(__name__)
 
 CLAUDE_API_KEY    = os.getenv("CLAUDE_API_KEY", "")
 OPENAI_API_KEY    = os.getenv("OPENAI_API_KEY", "")
-CLAUDE_MODEL      = "claude-3-haiku-20240307"   # fast + cheap for hackathon
-OPENAI_MODEL      = "gpt-3.5-turbo"             # fallback
-
+CLAUDE_MODEL      = "claude-3-haiku-20240307"
+OPENAI_MODEL      = "gpt-3.5-turbo"
 
 async def _call_claude(system_prompt: str, user_message: str, max_tokens: int = 512) -> Optional[str]:
     """Call Claude API."""
@@ -45,7 +36,6 @@ async def _call_claude(system_prompt: str, user_message: str, max_tokens: int = 
         log.warning(f"Claude API error: {e}")
         return None
 
-
 async def _call_openai(system_prompt: str, user_message: str, max_tokens: int = 512) -> Optional[str]:
     """Call OpenAI GPT API."""
     if not OPENAI_API_KEY:
@@ -70,14 +60,12 @@ async def _call_openai(system_prompt: str, user_message: str, max_tokens: int = 
         log.warning(f"OpenAI API error: {e}")
         return None
 
-
 async def _llm(system_prompt: str, user_message: str, max_tokens: int = 512) -> Optional[str]:
     """Try Claude first, fall back to OpenAI."""
     result = await _call_claude(system_prompt, user_message, max_tokens)
     if result:
         return result
     return await _call_openai(system_prompt, user_message, max_tokens)
-
 
 async def explain_scheme(scheme_name: str, benefits: str, user_profile: dict, language: str = "en") -> str:
     """
@@ -100,9 +88,7 @@ Write 2 short sentences: (1) what they get, (2) why they specifically qualify.""
     if result:
         return result
 
-    # Rule-based fallback
     return f"You qualify for *{scheme_name}*! This scheme offers: {benefits}."
-
 
 async def generate_apply_guide(scheme_name: str, apply_steps: list, documents: list, language: str = "en") -> str:
     """
@@ -128,13 +114,11 @@ Format as numbered steps with a documents section."""
     if result:
         return result
 
-    # Rule-based fallback
     lines = [f"📋 *How to apply for {scheme_name}*\n"]
     for i, step in enumerate(apply_steps, 1):
         lines.append(f"{i}. {step}")
     lines.append(f"\n📄 *Documents needed:* {docs_text}")
     return "\n".join(lines)
-
 
 async def generate_followup_response(question: str, user_profile: dict, language: str = "en") -> str:
     """
@@ -157,18 +141,16 @@ If you don't know the exact answer, direct them to the official portal."""
     return ("I'm not sure about that specific detail. "
             "Please visit myscheme.gov.in or call the helpline 1800-NO-HELPLINE for accurate information.")
 
-
 async def detect_language(text: str) -> str:
     """
     Detect language from first message. Returns 'hi' for Hindi, 'en' for English.
     Uses simple heuristic first, LLM as fallback for edge cases.
     """
-    # Fast heuristic: check for Devanagari script characters
+
     devanagari_chars = sum(1 for c in text if '\u0900' <= c <= '\u097F')
     if devanagari_chars > 0:
         return "hi"
 
-    # Check for Hindi romanised keywords
     hindi_keywords = ["namaste", "namaskar", "haan", "nahi", "kya", "mera", "meri",
                       "hai", "hoon", "main", "aap", "kisan", "gaon", "ghar"]
     text_lower = text.lower()

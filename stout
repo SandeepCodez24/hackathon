@@ -1,0 +1,34 @@
+t=2026-03-16T09:44:23+0530 lvl=info msg="no configuration paths supplied"
+t=2026-03-16T09:44:24+0530 lvl=info msg="using configuration at default config path" path=C:\\Users\\sande\\AppData\\Local\\ngrok\\ngrok.yml
+t=2026-03-16T09:44:24+0530 lvl=info msg="open config file" path=C:\\Users\\sande\\AppData\\Local\\ngrok\\ngrok.yml err=nil
+t=2026-03-16T09:44:24+0530 lvl=info msg="FIPS 140 mode" enabled=false
+t=2026-03-16T09:44:24+0530 lvl=info msg="starting web service" obj=web addr=127.0.0.1:4040 allow_hosts=[]
+t=2026-03-16T09:44:25+0530 lvl=info msg="client session established" obj=tunnels.session
+t=2026-03-16T09:44:25+0530 lvl=info msg="tunnel session started" obj=tunnels.session
+t=2026-03-16T09:44:25+0530 lvl=info msg="started tunnel" obj=tunnels name=command_line addr=http://localhost:8001 url=https://highflying-nonsynthetically-odilia.ngrok-free.dev
+t=2026-03-16T09:46:47+0530 lvl=info msg="join connections" obj=join id=221a6eb52352 l=127.0.0.1:8001 r=[2a03:2880:22ff:8::]:36924
+t=2026-03-16T09:48:49+0530 lvl=info msg=start pg=/api/tunnels id=4de64dd3e9d91b3d
+t=2026-03-16T09:48:49+0530 lvl=info msg=end pg=/api/tunnels id=4de64dd3e9d91b3d status=200 dur=603.2µs
+t=2026-03-16T09:49:02+0530 lvl=info msg="join connections" obj=join id=0a53e9af3bda l=127.0.0.1:8001 r=[2a03:2880:10ff:73::]:64842
+t=2026-03-16T09:58:10+0530 lvl=info msg="join connections" obj=join id=7ccb198bb78b l=127.0.0.1:8001 r=[2a03:2880:22ff:71::]:65500
+t=2026-03-16T09:58:12+0530 lvl=info msg="join connections" obj=join id=10e2a4791cd6 l=127.0.0.1:8001 r=[2a03:2880:12ff::]:39008
+t=2026-03-16T09:58:13+0530 lvl=info msg="join connections" obj=join id=da04afb16ab4 l=127.0.0.1:8001 r=[2a03:2880:10ff:5::]:43890
+t=2026-03-16T09:58:15+0530 lvl=info msg="join connections" obj=join id=eae826ce1fab l=127.0.0.1:8001 r=[2a03:2880:10ff:7::]:42482
+t=2026-03-16T09:59:54+0530 lvl=info msg="join connections" obj=join id=8dfc30e2802d l=127.0.0.1:8001 r=[2a03:2880:12ff:71::]:50376
+t=2026-03-16T10:00:04+0530 lvl=info msg="join connections" obj=join id=093424c68bb1 l=127.0.0.1:8001 r=[2a03:2880:10ff:73::]:62932
+t=2026-03-16T10:00:05+0530 lvl=info msg="join connections" obj=join id=4dbf2a59b393 l=127.0.0.1:8001 r=[2a03:2880:22ff:73::]:53538
+t=2026-03-16T10:00:08+0530 lvl=info msg="join connections" obj=join id=0c575605dfc9 l=127.0.0.1:8001 r=[2a03:2880:10ff:4::]:51066
+t=2026-03-16T10:02:44+0530 lvl=info msg="join connections" obj=join id=dc79f29c57b0 l=127.0.0.1:8001 r=[2a03:2880:21ff:46::]:56892
+t=2026-03-16T10:02:52+0530 lvl=info msg="join connections" obj=join id=2ae3e81712b8 l=127.0.0.1:8001 r=[2a03:2880:22ff:7d::]:52220
+t=2026-03-16T10:03:02+0530 lvl=info msg=start pg=/api/tunnels id=dada9b9af5b811f0
+t=2026-03-16T10:03:02+0530 lvl=info msg=end pg=/api/tunnels id=dada9b9af5b811f0 status=200 dur=0s
+t=2026-03-16T10:03:18+0530 lvl=info msg="join connections" obj=join id=5c67eaca530a l=127.0.0.1:8001 r=[2a03:2880:22ff:8::]:58744
+t=2026-03-16T10:04:35+0530 lvl=info msg="join connections" obj=join id=1cc6d81dc91a l=127.0.0.1:8001 r=[2a03:2880:10ff:4::]:60268
+t=2026-03-16T10:08:37+0530 lvl=info msg="Got quit command" obj=consoleui
+t=2026-03-16T10:08:37+0530 lvl=info msg="received stop request" obj=app stopReq="{err:<nil> restart:false}"
+t=2026-03-16T10:08:37+0530 lvl=info msg="session closing" obj=tunnels.session err=nil
+t=2026-03-16T10:08:37+0530 lvl=info msg="accept failed" obj=tunnels.session obj=csess id=63217a8cdd3f err="reconnecting session closed"
+t=2026-03-16T10:08:37+0530 lvl=info msg="failed to accept connection: Listener closed" obj=tunnels.session clientid=2aeb905bbe1e44a7ddf512eaaa14a721
+t=2026-03-16T10:08:37+0530 lvl=warn msg="Stopping forwarder" name=command_line acceptErr="failed to accept connection: Listener closed"
+t=2026-03-16T10:08:37+0530 lvl=info msg="no more state changes" obj=tunnels.session
+t=2026-03-16T10:08:37+0530 lvl=warn msg="Error restarting forwarder" name=command_line err="failed to start tunnel: session closed"

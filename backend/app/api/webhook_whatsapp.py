@@ -1,12 +1,3 @@
-"""
-WhatsApp Webhook — Meta Cloud API integration point.
-Handles the full conversation flow:
-  greeting → questions → results → apply guide → HELP
-
-GET  /webhook/whatsapp — Meta verification handshake
-POST /webhook/whatsapp — Incoming message handler
-"""
-
 import os
 import hmac
 import hashlib
@@ -37,11 +28,6 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["whatsapp"])
 
-
-# ============================================================
-# Webhook Verification (GET)
-# ============================================================
-
 @router.get("/webhook/whatsapp")
 async def verify_webhook(
     hub_mode: str = Query(None, alias="hub.mode"),
@@ -62,11 +48,6 @@ async def verify_webhook(
     logger.warning(f"❌ Webhook verification failed: mode={hub_mode}, token={hub_verify_token}")
     raise HTTPException(status_code=403, detail="Verification failed")
 
-
-# ============================================================
-# Incoming Message Handler (POST)
-# ============================================================
-
 @router.post("/webhook/whatsapp")
 async def handle_incoming(request: Request):
     """
@@ -75,10 +56,6 @@ async def handle_incoming(request: Request):
     """
     body = await request.json()
 
-    # Verify webhook signature (optional but recommended)
-    # _verify_signature(request, body)
-
-    # Extract message data from the Meta wrapper
     try:
         entry = body.get("entry", [{}])[0]
         changes = entry.get("changes", [{}])[0]
@@ -86,31 +63,27 @@ async def handle_incoming(request: Request):
         messages = value.get("messages", [])
 
         if not messages:
-            # Status update (delivered, read, etc.) — ignore
+
             return {"status": "ok"}
 
         msg = messages[0]
-        phone = msg["from"]  # e.g. "919876543210"
+        phone = msg["from"]
         msg_type = msg["type"]
         msg_id = msg.get("id", "")
 
         logger.info(f"📩 Incoming [{msg_type}] from {phone}")
 
-        # Mark as read (blue ticks)
         if msg_id:
             await WhatsAppClient.mark_read(msg_id)
 
-        # Extract text based on message type
         text = _extract_text(msg, msg_type)
 
-        # Route to conversation handler
         await handle_conversation(phone, text, msg_type, msg)
 
     except Exception as e:
         logger.error(f"Webhook error: {e}", exc_info=True)
 
     return {"status": "ok"}
-
 
 def _extract_text(msg: dict, msg_type: str) -> str:
     """Extract user's text/selection from different message types."""
@@ -131,11 +104,6 @@ def _extract_text(msg: dict, msg_type: str) -> str:
 
     return msg.get("text", {}).get("body", "")
 
-
-# ============================================================
-# Conversation Orchestrator
-# ============================================================
-
 async def handle_conversation(phone: str, text: str, msg_type: str, raw_msg: dict):
     """
     Full conversation state machine:
@@ -153,7 +121,6 @@ async def handle_conversation(phone: str, text: str, msg_type: str, raw_msg: dic
     session = await SessionManager.get_or_create(session_id, channel="whatsapp")
     text_upper = text.upper().strip()
 
-    # ---- Handle voice notes ----
     if text.startswith("__VOICE__:"):
         media_id = text.replace("__VOICE__:", "")
         transcribed = await transcribe_voice(media_id)
@@ -164,38 +131,32 @@ async def handle_conversation(phone: str, text: str, msg_type: str, raw_msg: dic
         text = transcribed
         text_upper = text.upper().strip()
 
-    # ---- HELP command ----
     if text_upper in ("HELP", "MENU", "?"):
         session.state = SessionState.GREETING
         await SessionManager.save(session)
         await WhatsAppClient.send_text(phone, format_help_message(session.language))
-        # Send restart button
+
         await WhatsAppClient.send_buttons(phone, "Would you like to start over?", [
             {"id": "cmd_start", "title": "Start Over"},
         ])
         return
 
-    # ---- GREETING state: Start/restart ----
     if text_upper in ("HI", "HELLO", "START", "NAMASTE", "हाँ", "शुरू", "HAI", "HEY") or \
        text_upper == "CMD_START" or session.state == SessionState.GREETING:
 
-        # Detect language from first message
         detected_lang = detect_language_from_text(text)
         if detected_lang == "en":
-            detected_lang = await detect_language(text)  # LLM fallback for romanised Hindi
+            detected_lang = await detect_language(text)
 
-        # Reset session for fresh start
         await SessionManager.delete(session_id)
         session = await SessionManager.get_or_create(session_id, channel="whatsapp")
         session.language = detected_lang
         session.state = SessionState.QUESTIONING
         await SessionManager.save(session)
 
-        # Send language-aware welcome
         welcome = get_welcome_message(detected_lang)
         await WhatsAppClient.send_text(phone, welcome)
 
-        # Send first question using info gain
         all_schemes = await get_all_schemes()
         candidate_schemes = [s for s in all_schemes if s.id in session.candidates]
         first_q = AdaptiveQuestionEngine.select_next_question(session, candidate_schemes)
@@ -204,15 +165,13 @@ async def handle_conversation(phone: str, text: str, msg_type: str, raw_msg: dic
             await _send_question(phone, first_q, session.language)
         return
 
-    # ---- RESULTS state: User selects a scheme number ----
     if session.state == SessionState.RESULTS:
         if text_upper == "BACK":
-            # Re-show results
+
             results_msg = format_results_message(session.recommendations, session.language)
             await WhatsAppClient.send_text(phone, results_msg)
             return
 
-        # Check if user typed a scheme number (1, 2, 3...)
         try:
             idx = int(text.strip()) - 1
             if 0 <= idx < len(session.recommendations):
@@ -222,7 +181,6 @@ async def handle_conversation(phone: str, text: str, msg_type: str, raw_msg: dic
                     session.state = SessionState.APPLY_GUIDE
                     await SessionManager.save(session)
 
-                    # Use LLM for personalised guide (falls back to static)
                     guide = await generate_apply_guide(
                         scheme.name,
                         scheme.apply_steps or [],
@@ -231,7 +189,6 @@ async def handle_conversation(phone: str, text: str, msg_type: str, raw_msg: dic
                     )
                     await WhatsAppClient.send_text(phone, guide)
 
-                    # Send link button if portal URL exists
                     if scheme.portal_url:
                         await WhatsAppClient.send_link_button(
                             phone,
@@ -243,14 +200,12 @@ async def handle_conversation(phone: str, text: str, msg_type: str, raw_msg: dic
         except (ValueError, IndexError):
             pass
 
-        # Unknown input in results state
         await WhatsAppClient.send_text(
             phone,
             "📝 Reply with a *number* (1, 2, 3...) to see apply guide.\nOr *HELP* to restart."
         )
         return
 
-    # ---- APPLY_GUIDE state ----
     if session.state == SessionState.APPLY_GUIDE:
         if text_upper == "BACK":
             session.state = SessionState.RESULTS
@@ -259,20 +214,16 @@ async def handle_conversation(phone: str, text: str, msg_type: str, raw_msg: dic
             await WhatsAppClient.send_text(phone, results_msg)
             return
 
-        # Any other input → show help
         await WhatsAppClient.send_text(
             phone, "Reply *BACK* for results or *HELP* to restart."
         )
         return
 
-    # ---- QUESTIONING state: Process answers ----
     if session.state == SessionState.QUESTIONING:
         await _process_answer(phone, text, session)
         return
 
-    # Fallback
     await WhatsAppClient.send_text(phone, "Say *Hi* to start! 🙏")
-
 
 async def _process_answer(phone: str, text: str, session):
     """
@@ -284,11 +235,10 @@ async def _process_answer(phone: str, text: str, session):
     """
     all_schemes = await get_all_schemes()
 
-    # Parse the reply — could be a button ID like "q_occupation_2"
     question, answer_value = _parse_reply(text)
 
     if question is None:
-        # Free text — try to match to current question
+
         if session.current_question:
             question = AdaptiveQuestionEngine.get_question_by_id(session.current_question)
             answer_value = text
@@ -299,29 +249,25 @@ async def _process_answer(phone: str, text: str, session):
             )
             return
 
-    # Apply answer to profile
     session.profile = AdaptiveQuestionEngine.apply_answer_to_profile(
         session.profile, question, str(answer_value)
     )
     session.questions_asked.append(question["id"])
     session.question_count += 1
 
-    # Prune candidates
     session.candidates = EligibilityEngine.prune_candidates(
         session.profile, all_schemes, session.candidates
     )
 
-    # Check if we should stop
     candidate_schemes = [s for s in all_schemes if s.id in session.candidates]
 
     if session.is_complete() or len(candidate_schemes) <= 5:
-        # ── Fraud check (Phase 5) ─────────────────────────────────────────────
+
         is_suspicious, risk_score, rules_triggered = check_fraud(session.profile)
         if is_suspicious:
             logger.warning(f"🚩 Fraud flag for {phone}: score={risk_score}, rules={rules_triggered}")
             await WhatsAppClient.send_text(phone, get_fraud_flag_message(session.language))
 
-        # Generate recommendations
         session.recommendations = EligibilityEngine.score_and_rank(
             session.profile, candidate_schemes, min_confidence=20.0
         )
@@ -332,11 +278,10 @@ async def _process_answer(phone: str, text: str, session):
         await WhatsAppClient.send_text(phone, results_msg)
         return
 
-    # Select next question via info gain
     next_q = AdaptiveQuestionEngine.select_next_question(session, candidate_schemes)
 
     if next_q is None:
-        # No more useful questions — show results
+
         session.recommendations = EligibilityEngine.score_and_rank(
             session.profile, candidate_schemes, min_confidence=20.0
         )
@@ -350,13 +295,10 @@ async def _process_answer(phone: str, text: str, session):
     session.current_question = next_q["id"]
     await SessionManager.save(session)
 
-    # Send progress indicator
     progress = f"_{session.question_count}/{session.max_questions} questions answered • {len(session.candidates)} schemes left_"
     await WhatsAppClient.send_text(phone, progress)
 
-    # Send next question
     await _send_question(phone, next_q, session.language)
-
 
 def _parse_reply(text: str) -> tuple:
     """
@@ -381,13 +323,11 @@ def _parse_reply(text: str) -> tuple:
                 opt = options[option_idx]
                 return question, opt.get("value", opt.get("label", ""))
 
-    # Try matching without index — maybe it's a full question ID
     question = AdaptiveQuestionEngine.get_question_by_id(text)
     if question:
         return question, None
 
     return None, None
-
 
 async def _send_question(phone: str, question: dict, language: str = "en"):
     """Send a question as buttons or list based on option count."""
@@ -398,13 +338,8 @@ async def _send_question(phone: str, question: dict, language: str = "en"):
         )
     else:
         fmt = format_question_buttons(question, language)
-        buttons = fmt["buttons"][:3]  # WhatsApp max 3 buttons
+        buttons = fmt["buttons"][:3]
         await WhatsAppClient.send_buttons(phone, fmt["body"], buttons)
-
-
-# ============================================================
-# Signature Verification (for production)
-# ============================================================
 
 def _verify_signature(request: Request, body: bytes) -> bool:
     """
@@ -412,7 +347,7 @@ def _verify_signature(request: Request, body: bytes) -> bool:
     """
     app_secret = os.getenv("META_APP_SECRET", "")
     if not app_secret:
-        return True  # Skip in development
+        return True
 
     signature = request.headers.get("x-hub-signature-256", "")
     if not signature.startswith("sha256="):

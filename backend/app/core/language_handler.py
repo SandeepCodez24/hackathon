@@ -1,10 +1,3 @@
-"""
-Language Handler — Phase 4
-Bhashini API integration for 10+ Indian languages.
-Translates scheme content and bot responses to the user's language.
-Falls back gracefully to English if Bhashini is unavailable.
-"""
-
 import os
 import logging
 import httpx
@@ -15,7 +8,6 @@ BHASHINI_API_KEY    = os.getenv("BHASHINI_API_KEY", "")
 BHASHINI_USER_ID    = os.getenv("BHASHINI_USER_ID", "")
 BHASHINI_BASE_URL   = "https://dhruva-api.bhashini.gov.in/services/inference/pipeline"
 
-# Supported languages (BCP-47 codes → display names)
 SUPPORTED_LANGUAGES = {
     "en":  "English",
     "hi":  "हिंदी (Hindi)",
@@ -30,7 +22,6 @@ SUPPORTED_LANGUAGES = {
     "or":  "ଓଡ଼ିଆ (Odia)",
 }
 
-# Pre-translated welcome messages for instant response (no API needed)
 WELCOME_MESSAGES = {
     "en": "🙏 Welcome to GovScheme Assistant!\n\nI'll help you find government schemes you qualify for in under 3 minutes.\n\nReply *HINDI* for Hindi, or let's continue in English.",
     "hi": "🙏 GovScheme सहायक में आपका स्वागत है!\n\nमैं आपको 3 मिनट में सरकारी योजनाओं का पता लगाने में मदद करूंगा।",
@@ -45,7 +36,6 @@ WELCOME_MESSAGES = {
     "or": "🙏 GovScheme ସହାୟକରେ ଆପଣଙ୍କୁ ସ୍ୱାଗତ!\n\nମୁଁ 3 ମିନିଟ୍ ମଧ୍ୟରେ ସରକାରୀ ଯୋଜନା ଖୋଜିବାରେ ସାହାଯ୍ୟ କରିବି।",
 }
 
-# Language selection prompt for WhatsApp buttons
 LANGUAGE_SELECT_PROMPT = "🌐 *Choose your language / भाषा चुनें:*"
 LANGUAGE_BUTTONS = [
     {"id": "lang_en", "title": "English"},
@@ -63,7 +53,6 @@ MORE_LANGUAGES_LIST = [
     {"id": "lang_ml", "title": "മലയാളം"},
     {"id": "lang_pa", "title": "ਪੰਜਾਬੀ"},
 ]
-
 
 async def translate_text(text: str, source_lang: str, target_lang: str) -> str:
     """
@@ -110,39 +99,29 @@ async def translate_text(text: str, source_lang: str, target_lang: str) -> str:
         log.warning(f"Bhashini translation failed: {e} — returning original")
         return text
 
-
 def get_welcome_message(language: str) -> str:
-    """Get pre-translated welcome message for a language."""
     return WELCOME_MESSAGES.get(language, WELCOME_MESSAGES["en"])
 
-
 def parse_language_from_button(button_id: str) -> str:
-    """Parse language code from button ID like 'lang_hi' → 'hi'."""
     if button_id.startswith("lang_"):
         lang = button_id.replace("lang_", "")
         if lang in SUPPORTED_LANGUAGES and lang != "more":
             return lang
     return "en"
 
-
 def detect_language_from_text(text: str) -> str:
-    """
-    Fast heuristic language detection from script ranges.
-    Returns BCP-47 language code.
-    """
     text = text.strip()
 
-    # Script-based detection (most reliable)
     script_ranges = {
-        "hi": ('\u0900', '\u097F'),  # Devanagari (Hindi/Marathi)
-        "bn": ('\u0980', '\u09FF'),  # Bengali
-        "gu": ('\u0A80', '\u0AFF'),  # Gujarati
-        "pa": ('\u0A00', '\u0A7F'),  # Gurmukhi (Punjabi)
-        "or": ('\u0B00', '\u0B7F'),  # Odia
-        "ta": ('\u0B80', '\u0BFF'),  # Tamil
-        "te": ('\u0C00', '\u0C7F'),  # Telugu
-        "kn": ('\u0C80', '\u0CFF'),  # Kannada
-        "ml": ('\u0D00', '\u0D7F'),  # Malayalam
+        "hi": ('\u0900', '\u097F'),
+        "bn": ('\u0980', '\u09FF'),
+        "gu": ('\u0A80', '\u0AFF'),
+        "pa": ('\u0A00', '\u0A7F'),
+        "or": ('\u0B00', '\u0B7F'),
+        "ta": ('\u0B80', '\u0BFF'),
+        "te": ('\u0C00', '\u0C7F'),
+        "kn": ('\u0C80', '\u0CFF'),
+        "ml": ('\u0D00', '\u0D7F'),
     }
 
     char_counts = {lang: 0 for lang in script_ranges}
@@ -151,10 +130,8 @@ def detect_language_from_text(text: str) -> str:
             if start <= char <= end:
                 char_counts[lang] += 1
 
-    # Return language with most matching characters
     max_lang = max(char_counts, key=char_counts.get)
     if char_counts[max_lang] > 0:
-        # Marathi also uses Devanagari — keep as 'hi' for simplicity
         return max_lang
 
     return "en"

@@ -1,11 +1,5 @@
-"""
-WhatsApp Response Formatter — Converts AI engine output to WhatsApp messages.
-Handles: welcome, questions (buttons/lists), results, apply guides, HELP.
-"""
-
 from typing import Optional
 from app.models.session import Session, SchemeRecommendation
-
 
 def format_welcome_message(language: str = "en") -> str:
     """Welcome message sent on first 'Hi'."""
@@ -23,7 +17,6 @@ def format_welcome_message(language: str = "en") -> str:
         "_Type *HELP* anytime to restart_"
     )
 
-
 def format_question_buttons(question: dict, language: str = "en") -> dict:
     """
     Format a question as WhatsApp interactive buttons.
@@ -39,12 +32,11 @@ def format_question_buttons(question: dict, language: str = "en") -> dict:
         label = opt.get(f"label_hi", opt["label"]) if language == "hi" else opt["label"]
         buttons.append({
             "id": f"{question['id']}_{i}",
-            "title": label[:20],  # WhatsApp limit
+            "title": label[:20],
             "value": opt.get("value", opt["label"]),
         })
 
     return {"body": body, "buttons": buttons}
-
 
 def format_question_list(question: dict, language: str = "en") -> dict:
     """
@@ -72,11 +64,9 @@ def format_question_list(question: dict, language: str = "en") -> dict:
         "items": items,
     }
 
-
 def should_use_list(question: dict) -> bool:
     """Check if this question needs a list (>3 options) or buttons (≤3)."""
     return len(question.get("options", [])) > 3
-
 
 def format_results_message(
     recommendations: list[SchemeRecommendation],
@@ -129,7 +119,6 @@ def format_results_message(
 
     return header + body + footer
 
-
 def format_apply_guide(scheme_data: dict, language: str = "en") -> str:
     """
     Format the step-by-step apply guide for a specific scheme.
@@ -157,7 +146,6 @@ def format_apply_guide(scheme_data: dict, language: str = "en") -> str:
     lines.append("\n_Reply *BACK* for results or *HELP* to restart_")
 
     return "\n".join(lines)
-
 
 def format_help_message(language: str = "en") -> str:
     """HELP command response."""

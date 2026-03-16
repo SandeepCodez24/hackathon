@@ -1,8 +1,3 @@
-"""
-Seed schemes to MongoDB Atlas.
-Run: python data/seed_to_atlas.py
-"""
-
 import asyncio
 import json
 import logging
@@ -17,24 +12,20 @@ logger = logging.getLogger(__name__)
 ATLAS_URL = "mongodb+srv://sandeepcodez24:23AD55%24anDeeP@mlappcluster1.ikzbjb0.mongodb.net/"
 DB_NAME = "govscheme"
 
-
 async def seed():
     from motor.motor_asyncio import AsyncIOMotorClient
 
     logger.info("🔌 Connecting to MongoDB Atlas...")
     client = AsyncIOMotorClient(ATLAS_URL, serverSelectionTimeoutMS=10000)
 
-    # Test connection
     await client.admin.command("ping")
     logger.info("✅ Connected to MongoDB Atlas!")
 
     db = client[DB_NAME]
 
-    # Load JSON files
     base_dir = Path(__file__).resolve().parent.parent.parent
     schemes = []
 
-    # schemes_eligibility.json
     elig_path = base_dir / "schemes_eligibility.json"
     if elig_path.exists():
         with open(elig_path, "r", encoding="utf-8") as f:
@@ -45,7 +36,6 @@ async def seed():
                 schemes.extend(data)
         logger.info(f"📂 Loaded {len(schemes)} from schemes_eligibility.json")
 
-    # schemes_part2.json
     part2_path = base_dir / "schemes_part2.json"
     if part2_path.exists():
         with open(part2_path, "r", encoding="utf-8") as f:
@@ -56,7 +46,6 @@ async def seed():
                 schemes.extend(data["schemes"])
         logger.info(f"📂 Total: {len(schemes)} schemes loaded")
 
-    # Clear and seed
     await db.schemes.delete_many({})
     logger.info("🗑️  Cleared existing schemes collection")
 
@@ -64,11 +53,9 @@ async def seed():
         result = await db.schemes.insert_many(schemes)
         logger.info(f"✅ Inserted {len(result.inserted_ids)} schemes into Atlas")
 
-    # Verify
     count = await db.schemes.count_documents({})
     logger.info(f"📋 Verification: {count} schemes in database")
 
-    # Print categories
     pipeline = [
         {"$group": {"_id": "$category", "count": {"$sum": 1}}},
         {"$sort": {"count": -1}},
@@ -76,7 +63,6 @@ async def seed():
     async for doc in db.schemes.aggregate(pipeline):
         logger.info(f"   • {doc['_id']}: {doc['count']} schemes")
 
-    # Create indexes
     await db.schemes.create_index("id", unique=True)
     await db.schemes.create_index("category")
     await db.schemes.create_index("type")
@@ -84,7 +70,6 @@ async def seed():
 
     client.close()
     logger.info("🏁 Seeding to Atlas complete!")
-
 
 if __name__ == "__main__":
     asyncio.run(seed())

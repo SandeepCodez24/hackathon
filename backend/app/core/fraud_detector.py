@@ -1,17 +1,9 @@
-"""
-Fraud Detector — Phase 5
-Isolation Forest anomaly detector + rule-based consistency checker.
-Silently flags suspicious profiles without blocking honest citizens.
-"""
-
 import logging
 import math
 from typing import Tuple
 
 log = logging.getLogger(__name__)
 
-# ── Rule-based consistency checks ─────────────────────────────────────────────
-# Each rule is (description, lambda that returns True if SUSPICIOUS)
 CONSISTENCY_RULES = [
     ("Farmer with no land and very high income",
      lambda p: p.get("occupation") == "Farmer"
@@ -48,7 +40,6 @@ CONSISTENCY_RULES = [
                and p.get("property_value", 0) > 5000000),
 ]
 
-
 def _profile_to_vector(profile: dict) -> list:
     """
     Convert profile to numeric feature vector for Isolation Forest.
@@ -64,7 +55,7 @@ def _profile_to_vector(profile: dict) -> list:
 
     return [
         float(profile.get("age", 30)),
-        float(profile.get("annual_income", 200000)) / 100000,   # normalised to lakhs
+        float(profile.get("annual_income", 200000)) / 100000,
         float(profile.get("land_acres", 0)),
         float(profile.get("family_size", 4)),
         float(occupation_map.get(profile.get("occupation", "Other"), 10)),
@@ -75,7 +66,6 @@ def _profile_to_vector(profile: dict) -> list:
         1.0 if profile.get("pregnant") else 0.0,
     ]
 
-
 def _isolation_score(vector: list) -> float:
     """
     Lightweight Isolation Forest approximation without scikit-learn dependency.
@@ -83,12 +73,10 @@ def _isolation_score(vector: list) -> float:
     
     Returns: anomaly score 0.0 (normal) → 1.0 (highly anomalous)
     """
-    # Representative means and std devs from typical Indian citizen profiles
-    # [age, income_lakh, land, family_size, occupation, caste, gender, disabled, aadhaar, pregnant]
+
     MEANS    = [32.0, 2.0, 1.2, 4.0, 4.5,  2.0, 1.3, 0.1, 0.7, 0.05]
     STD_DEVS = [12.0, 1.5, 2.0, 2.0, 2.5,  1.2, 0.5, 0.3, 0.45, 0.22]
 
-    # Compute normalised Euclidean distance (Mahalanobis-lite)
     total = 0.0
     for i, (v, mean, std) in enumerate(zip(vector, MEANS, STD_DEVS)):
         if std > 0:
@@ -97,10 +85,8 @@ def _isolation_score(vector: list) -> float:
 
     distance = math.sqrt(total / len(vector))
 
-    # Sigmoid-like normalisation: score 0–1
     score = 1 - (1 / (1 + distance / 3))
     return min(score, 1.0)
-
 
 def check_fraud(profile: dict) -> Tuple[bool, float, list]:
     """
@@ -111,21 +97,18 @@ def check_fraud(profile: dict) -> Tuple[bool, float, list]:
     """
     triggered_rules = []
 
-    # ── Rule-based consistency checks ─────────────────────────────────────────
     for description, rule_fn in CONSISTENCY_RULES:
         try:
             if rule_fn(profile):
                 triggered_rules.append(description)
                 log.warning(f"🚩 Fraud rule triggered: {description} | profile={profile}")
         except Exception:
-            pass  # Never crash on fraud check
+            pass
 
-    # ── Isolation Forest approximation ────────────────────────────────────────
     vector = _profile_to_vector(profile)
     anomaly_score = _isolation_score(vector)
 
-    # ── Combined risk score ────────────────────────────────────────────────────
-    rule_score   = min(len(triggered_rules) * 0.25, 1.0)   # each rule +25%, max 1.0
+    rule_score   = min(len(triggered_rules) * 0.25, 1.0)
     combined     = max(anomaly_score * 0.4 + rule_score * 0.6, rule_score)
 
     is_suspicious = combined > 0.5 or len(triggered_rules) >= 2
@@ -136,7 +119,6 @@ def check_fraud(profile: dict) -> Tuple[bool, float, list]:
         log.debug(f"✅ Profile OK | anomaly_score={anomaly_score:.2f} | combined={combined:.2f}")
 
     return is_suspicious, round(combined, 3), triggered_rules
-
 
 def get_fraud_flag_message(language: str = "en") -> str:
     """

@@ -1,8 +1,3 @@
-"""
-Session API — Start eligibility session, answer questions, get recommendations.
-Uses AdaptiveQuestionEngine with information gain for optimal question selection.
-"""
-
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional
@@ -15,24 +10,20 @@ from app.models.session import SessionState, SchemeRecommendation
 
 router = APIRouter(prefix="/api/session", tags=["session"])
 
-
 class StartSessionRequest(BaseModel):
     phone: Optional[str] = None
     channel: str = "web"
     language: str = "en"
-
 
 class StartSessionResponse(BaseModel):
     session_id: str
     total_schemes: int
     first_question: dict
 
-
 class AnswerRequest(BaseModel):
     session_id: str
     question_id: str
     answer: str
-
 
 class AnswerResponse(BaseModel):
     session_id: str
@@ -41,7 +32,6 @@ class AnswerResponse(BaseModel):
     is_complete: bool
     next_question: Optional[dict] = None
     recommendations: Optional[list[SchemeRecommendation]] = None
-
 
 class EligibilityDirectRequest(BaseModel):
     """Direct eligibility check — skip questions, provide full profile."""
@@ -62,7 +52,6 @@ class EligibilityDirectRequest(BaseModel):
     owns_pucca_house: Optional[bool] = None
     is_government_employee: Optional[bool] = None
 
-
 @router.post("/start", response_model=StartSessionResponse)
 async def start_session(req: StartSessionRequest):
     """Start a new eligibility assessment session."""
@@ -73,13 +62,12 @@ async def start_session(req: StartSessionRequest):
     session.state = SessionState.QUESTIONING
     await SessionManager.save(session)
 
-    # Use info-gain engine to pick the BEST first question
     all_schemes = await get_all_schemes()
     candidate_schemes = [s for s in all_schemes if s.id in session.candidates]
     first_q = AdaptiveQuestionEngine.select_next_question(session, candidate_schemes)
 
     if not first_q:
-        # Fallback — shouldn't happen with 52+ schemes
+
         first_q = AdaptiveQuestionEngine.get_question_by_id("q_occupation")
 
     return StartSessionResponse(
@@ -87,7 +75,6 @@ async def start_session(req: StartSessionRequest):
         total_schemes=len(session.candidates),
         first_question=first_q,
     )
-
 
 @router.post("/answer", response_model=AnswerResponse)
 async def submit_answer(req: AnswerRequest):
@@ -104,32 +91,27 @@ async def submit_answer(req: AnswerRequest):
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
 
-    # Get question details
     question = AdaptiveQuestionEngine.get_question_by_id(req.question_id)
     if not question:
         raise HTTPException(status_code=400, detail=f"Unknown question: {req.question_id}")
 
-    # Apply answer to profile using adaptive engine
     session.profile = AdaptiveQuestionEngine.apply_answer_to_profile(
         session.profile, question, req.answer
     )
 
-    # Record question
     session.questions_asked.append(req.question_id)
     session.question_count += 1
 
-    # Prune candidates
     all_schemes = await get_all_schemes()
     session.candidates = EligibilityEngine.prune_candidates(
         session.profile, all_schemes, session.candidates
     )
 
-    # Check if we should stop
     should_stop = session.is_complete()
     candidate_schemes = [s for s in all_schemes if s.id in session.candidates]
 
     if should_stop:
-        # Generate recommendations
+
         session.recommendations = EligibilityEngine.score_and_rank(
             session.profile, candidate_schemes, min_confidence=20.0
         )
@@ -144,11 +126,10 @@ async def submit_answer(req: AnswerRequest):
             recommendations=session.recommendations[:10],
         )
 
-    # Use information gain to select the BEST next question
     next_q = AdaptiveQuestionEngine.select_next_question(session, candidate_schemes)
 
     if not next_q:
-        # No more informative questions — generate results
+
         session.recommendations = EligibilityEngine.score_and_rank(
             session.profile, candidate_schemes, min_confidence=20.0
         )
@@ -174,7 +155,6 @@ async def submit_answer(req: AnswerRequest):
         next_question=next_q,
     )
 
-
 @router.get("/{session_id}/recommend")
 async def get_recommendations(session_id: str):
     """Get current recommendations for a session (can be called at any point)."""
@@ -194,7 +174,6 @@ async def get_recommendations(session_id: str):
         "total_candidates": len(session.candidates),
         "recommendations": [r.model_dump() for r in recommendations[:10]],
     }
-
 
 @router.get("/{session_id}/question-gains")
 async def get_question_gains(session_id: str):
@@ -217,7 +196,6 @@ async def get_question_gains(session_id: str):
         "question_gains": gains,
     }
 
-
 @router.get("/{session_id}")
 async def get_session(session_id: str):
     """Get session details."""
@@ -225,7 +203,6 @@ async def get_session(session_id: str):
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
     return session.model_dump(mode="json")
-
 
 @router.post("/eligibility/direct")
 async def direct_eligibility(req: EligibilityDirectRequest):

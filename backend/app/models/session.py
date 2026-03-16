@@ -1,13 +1,7 @@
-"""
-Pydantic models for citizen session data.
-Sessions are ephemeral (24hr TTL in Redis) — no permanent PII storage.
-"""
-
 from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
 from enum import Enum
-
 
 class SessionState(str, Enum):
     """Conversation state machine."""
@@ -16,7 +10,6 @@ class SessionState(str, Enum):
     RESULTS = "results"
     APPLY_GUIDE = "apply_guide"
     COMPLETED = "completed"
-
 
 class CitizenProfile(BaseModel):
     """Profile built incrementally from adaptive questions."""
@@ -32,7 +25,7 @@ class CitizenProfile(BaseModel):
     aadhaar_linked: Optional[bool] = None
     family_size: Optional[int] = None
     caste: Optional[str] = None
-    residence_type: Optional[str] = None  # "rural" or "urban"
+    residence_type: Optional[str] = None
     has_bank_account: Optional[bool] = None
     is_income_tax_payer: Optional[bool] = None
     is_government_employee: Optional[bool] = None
@@ -47,26 +40,24 @@ class CitizenProfile(BaseModel):
     employment_status: Optional[str] = None
     bpl_household: Optional[bool] = None
 
-
 class SchemeRecommendation(BaseModel):
     """A single scheme recommendation with confidence score."""
     scheme_id: str
     scheme_name: str
-    confidence: float  # 0-100 percentage
+    confidence: float
     benefit: str
     portal_url: str = ""
     category: str = ""
 
-
 class Session(BaseModel):
     """Citizen conversation session — stored in Redis with 24hr TTL."""
-    session_id: str  # "wa_+91XXXXXXXXXX" or "web_{uuid}"
-    channel: str = "whatsapp"  # "whatsapp" or "web"
+    session_id: str
+    channel: str = "whatsapp"
     language: str = "en"
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     profile: CitizenProfile = Field(default_factory=CitizenProfile)
-    candidates: list[str] = Field(default_factory=list)  # scheme IDs still in play
+    candidates: list[str] = Field(default_factory=list)
     questions_asked: list[str] = Field(default_factory=list)
     current_question: Optional[str] = None
     state: SessionState = SessionState.GREETING

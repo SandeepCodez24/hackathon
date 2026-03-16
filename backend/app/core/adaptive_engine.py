@@ -1,19 +1,3 @@
-"""
-Adaptive Question Engine — Information Gain-based question selection.
-
-Uses entropy reduction (information gain) to select the question that
-maximally prunes the candidate scheme set at each step.
-
-Algorithm:
-1. For each un-asked question, simulate every possible answer
-2. For each answer, count how many candidate schemes would remain
-3. Calculate the entropy (uncertainty) of the candidate set after asking
-4. Select the question with the LOWEST post-question entropy (= highest info gain)
-
-This is the same principle behind decision tree splitting (ID3/C4.5),
-applied dynamically to a conversational flow.
-"""
-
 import math
 import logging
 from typing import Optional
@@ -22,11 +6,6 @@ from app.models.session import Session, CitizenProfile, SessionState, SchemeReco
 from app.core.eligibility_engine import EligibilityEngine
 
 logger = logging.getLogger(__name__)
-
-
-# ============================================================
-# Question definitions with answer-to-profile mappings
-# ============================================================
 
 QUESTIONS = {
     "q_occupation": {
@@ -256,11 +235,6 @@ QUESTIONS = {
     },
 }
 
-
-# ============================================================
-# Entropy & Information Gain calculations
-# ============================================================
-
 def _entropy(counts: list[int]) -> float:
     """
     Calculate Shannon entropy: H = -Σ p(x) * log2(p(x))
@@ -276,7 +250,6 @@ def _entropy(counts: list[int]) -> float:
             entropy -= p * math.log2(p)
     return entropy
 
-
 def _simulate_answer(
     profile: CitizenProfile,
     question: dict,
@@ -287,14 +260,13 @@ def _simulate_answer(
     Simulate: if the user gives this answer, which schemes remain eligible?
     Returns list of remaining scheme IDs.
     """
-    # Create a hypothetical profile with this answer applied
+
     sim_profile = profile.model_copy()
     field = question["field"]
 
     if hasattr(sim_profile, field):
         setattr(sim_profile, field, answer_value)
 
-    # Check which candidates survive
     remaining = []
     for scheme in candidate_schemes:
         is_eligible, _ = EligibilityEngine.check_eligibility(sim_profile, scheme)
@@ -302,7 +274,6 @@ def _simulate_answer(
             remaining.append(scheme.id)
 
     return remaining
-
 
 def calculate_information_gain(
     profile: CitizenProfile,
@@ -321,39 +292,28 @@ def calculate_information_gain(
     if n_candidates <= 1:
         return 0.0
 
-    # Current entropy (before asking)
-    # All candidates are equally likely → H = log2(N)
     h_before = math.log2(n_candidates)
 
-    # Simulate each possible answer
-    answer_groups = []  # list of (remaining_count) for each answer
+    answer_groups = []
     for option in question["options"]:
         value = option["value"]
         remaining = _simulate_answer(profile, question, value, candidate_schemes)
         answer_groups.append(len(remaining))
 
-    # If no answer changes anything, info gain is 0
     if all(g == n_candidates for g in answer_groups):
         return 0.0
 
-    # Weighted average entropy after asking
     total_outcomes = sum(answer_groups) if sum(answer_groups) > 0 else 1
     h_after = 0.0
     for count in answer_groups:
         if count > 0:
             weight = count / total_outcomes
-            # Entropy within this answer's resulting set
-            # All remaining are "equally likely" within the group
+
             group_entropy = math.log2(count) if count > 1 else 0.0
             h_after += weight * group_entropy
 
     info_gain = h_before - h_after
-    return max(0.0, info_gain)  # Clamp to non-negative
-
-
-# ============================================================
-# Adaptive Question Engine
-# ============================================================
+    return max(0.0, info_gain)
 
 class AdaptiveQuestionEngine:
     """
@@ -388,10 +348,9 @@ class AdaptiveQuestionEngine:
             return None
 
         if len(candidate_schemes) <= 3:
-            # Narrow enough — no need for more questions
+
             return None
 
-        # Score each question by information gain
         scored = []
         for q in available:
             ig = calculate_information_gain(
@@ -399,7 +358,6 @@ class AdaptiveQuestionEngine:
             )
             scored.append((ig, q))
 
-        # Sort by info gain (descending)
         scored.sort(key=lambda x: x[0], reverse=True)
 
         if scored:
@@ -408,11 +366,9 @@ class AdaptiveQuestionEngine:
                 f"🧠 Best question: {best_q['id']} (info gain: {best_ig:.3f})"
             )
 
-            # Log top-3 for debugging
             for ig, q in scored[:3]:
                 logger.debug(f"   {q['id']}: IG={ig:.3f}")
 
-            # If best info gain is 0, no question helps — return None
             if best_ig <= 0.001:
                 logger.info("No question provides meaningful info gain. Stopping.")
                 return None
@@ -445,20 +401,20 @@ class AdaptiveQuestionEngine:
             setattr(updated, field, value)
 
         elif q_type == "range":
-            # Find matching option value
+
             for opt in question["options"]:
                 if opt["label"].lower() == answer.lower() or str(opt["value"]) == answer:
                     setattr(updated, field, opt["value"])
                     break
             else:
-                # Try direct integer conversion
+
                 try:
                     setattr(updated, field, int(answer))
                 except ValueError:
                     setattr(updated, field, answer)
 
         elif q_type == "choice":
-            # For residence_type, normalize to lowercase
+
             if field == "residence_type":
                 setattr(updated, field, answer.lower())
             else:

@@ -1,8 +1,3 @@
-"""
-WhatsApp Client — Meta Cloud API wrapper for sending messages.
-Supports: text, quick-reply buttons, list messages, documents, and deep-link buttons.
-"""
-
 import os
 import logging
 import httpx
@@ -13,14 +8,11 @@ logger = logging.getLogger(__name__)
 GRAPH_API_VERSION = "v21.0"
 GRAPH_API_BASE = f"https://graph.facebook.com/{GRAPH_API_VERSION}"
 
-
 def _get_token() -> str:
     return os.getenv("WHATSAPP_ACCESS_TOKEN", "")
 
-
 def _get_phone_id() -> str:
     return os.getenv("WHATSAPP_PHONE_NUMBER_ID", "")
-
 
 def _headers() -> dict:
     return {
@@ -28,18 +20,23 @@ def _headers() -> dict:
         "Content-Type": "application/json",
     }
 
-
 async def _send_request(payload: dict) -> dict:
-    """Send a message via Meta Cloud API."""
+    """Send a message via Meta Cloud API. Never raises — always returns dict."""
+    if not _get_token():
+        logger.warning("⚠️ WHATSAPP_ACCESS_TOKEN not set — cannot send message")
+        return {"error": "no_token"}
     url = f"{GRAPH_API_BASE}/{_get_phone_id()}/messages"
-    async with httpx.AsyncClient(timeout=15.0) as client:
-        resp = await client.post(url, json=payload, headers=_headers())
-        if resp.status_code != 200:
-            logger.error(f"WhatsApp API error {resp.status_code}: {resp.text}")
-        else:
-            logger.info(f"✅ Message sent to {payload.get('to', '?')}")
-        return resp.json()
-
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            resp = await client.post(url, json=payload, headers=_headers())
+            if resp.status_code != 200:
+                logger.error(f"WhatsApp API error {resp.status_code}: {resp.text}")
+            else:
+                logger.info(f"✅ Message sent to {payload.get('to', '?')}")
+            return resp.json()
+    except Exception as e:
+        logger.error(f"WhatsApp request failed: {e}")
+        return {"error": str(e)}
 
 class WhatsAppClient:
     """Send messages back to citizens via WhatsApp Business API."""
@@ -138,10 +135,17 @@ class WhatsAppClient:
         })
 
     @staticmethod
-    async def mark_read(message_id: str) -> dict:
-        """Mark a message as read (blue ticks)."""
-        return await _send_request({
-            "messaging_product": "whatsapp",
-            "status": "read",
-            "message_id": message_id,
-        })
+    async def mark_read(message_id: str) -> None:
+        """Mark a message as read (blue ticks). Silently ignores errors."""
+        if not message_id or not _get_token():
+            return
+        try:
+            url = f"{GRAPH_API_BASE}/{_get_phone_id()}/messages"
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                await client.post(url, json={
+                    "messaging_product": "whatsapp",
+                    "status": "read",
+                    "message_id": message_id,
+                }, headers=_headers())
+        except Exception as e:
+            logger.debug(f"mark_read failed (non-critical): {e}")

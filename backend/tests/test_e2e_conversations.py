@@ -1,14 +1,3 @@
-"""
-End-to-End Conversation Simulation Tests — Phase 2
-Simulates 12 complete user journeys through the adaptive question flow.
-
-Each test simulates a real citizen persona:
-1. Start a session (loads all 52 schemes as candidates)
-2. Answer a series of questions
-3. Verify recommendations match the expected schemes
-4. Verify question count is within 6-12 range
-"""
-
 import pytest
 import sys
 from pathlib import Path
@@ -22,13 +11,7 @@ from app.models.session import Session, SessionState, CitizenProfile, SchemeReco
 from app.db.database import load_schemes_from_files, get_memory_schemes
 import asyncio
 
-
-# ============================================================
-# Helper: Load real scheme data
-# ============================================================
-
 _schemes_cache = None
-
 
 def get_all_schemes_sync() -> list[Scheme]:
     """Load all schemes from JSON files (sync for tests)."""
@@ -40,7 +23,6 @@ def get_all_schemes_sync() -> list[Scheme]:
         raw = get_memory_schemes()
         _schemes_cache = [Scheme(**s) for s in raw]
     return _schemes_cache
-
 
 def simulate_conversation(answers: dict[str, str]) -> dict:
     """
@@ -66,38 +48,32 @@ def simulate_conversation(answers: dict[str, str]) -> dict:
     while rounds < max_rounds:
         rounds += 1
 
-        # Get candidate schemes
         candidate_schemes = [s for s in schemes if s.id in session.candidates]
 
-        # Select next question via info gain
         next_q = AdaptiveQuestionEngine.select_next_question(session, candidate_schemes)
 
         if next_q is None or session.is_complete():
             break
 
-        # Get the answer for this question's field
         field = next_q["field"]
         if field in answers:
             answer = answers[field]
         else:
-            # Skip questions we don't have answers for
+
             session.questions_asked.append(next_q["id"])
             session.question_count += 1
             continue
 
-        # Apply answer
         session.profile = AdaptiveQuestionEngine.apply_answer_to_profile(
             session.profile, next_q, answer
         )
         session.questions_asked.append(next_q["id"])
         session.question_count += 1
 
-        # Prune candidates
         session.candidates = EligibilityEngine.prune_candidates(
             session.profile, schemes, session.candidates
         )
 
-    # Generate final recommendations
     candidate_schemes = [s for s in schemes if s.id in session.candidates]
     recommendations = EligibilityEngine.score_and_rank(
         session.profile, candidate_schemes, min_confidence=20.0
@@ -112,11 +88,6 @@ def simulate_conversation(answers: dict[str, str]) -> dict:
         "top_confidence": recommendations[0].confidence if recommendations else 0,
         "profile": session.profile,
     }
-
-
-# ============================================================
-# E2E Test 1: Farmer in Bihar, BPL, low income
-# ============================================================
 
 class TestFarmerBihar:
     def test_farmer_bihar_gets_pm_kisan(self):
@@ -144,11 +115,6 @@ class TestFarmerBihar:
         assert len(result["recommendations"]) >= 3, \
             f"Expected at least 3 recommendations for a BPL farmer"
 
-
-# ============================================================
-# E2E Test 2: Young female student
-# ============================================================
-
 class TestFemaleStudent:
     def test_female_student_gets_scholarship(self):
         """A young female student should get education/scholarship schemes."""
@@ -169,11 +135,6 @@ class TestFemaleStudent:
 
         assert result["questions_asked"] <= 12
         assert len(result["recommendations"]) >= 2
-
-
-# ============================================================
-# E2E Test 3: Self-employed SC entrepreneur
-# ============================================================
 
 class TestSCEntrepreneur:
     def test_sc_entrepreneur_gets_standup_india(self):
@@ -196,11 +157,6 @@ class TestSCEntrepreneur:
         assert result["questions_asked"] <= 12
         assert len(result["recommendations"]) >= 2
 
-
-# ============================================================
-# E2E Test 4: Pregnant woman in rural area
-# ============================================================
-
 class TestPregnantWoman:
     def test_pregnant_woman_gets_maternity_benefit(self):
         """A pregnant woman should get PMMVY and health schemes."""
@@ -221,14 +177,9 @@ class TestPregnantWoman:
         })
 
         scheme_names = [r.scheme_name for r in result["recommendations"]]
-        # Should get maternity/nutrition schemes
+
         assert result["questions_asked"] <= 12
         assert len(result["recommendations"]) >= 3
-
-
-# ============================================================
-# E2E Test 5: Senior citizen (65+)
-# ============================================================
 
 class TestSeniorCitizen:
     def test_senior_gets_pension_schemes(self):
@@ -250,11 +201,6 @@ class TestSeniorCitizen:
         assert result["questions_asked"] <= 12
         assert len(result["recommendations"]) >= 2
 
-
-# ============================================================
-# E2E Test 6: Daily wage worker, urban
-# ============================================================
-
 class TestDailyWageWorker:
     def test_daily_worker_gets_eshram(self):
         """A daily wage worker should get e-Shram and welfare schemes."""
@@ -275,11 +221,6 @@ class TestDailyWageWorker:
         assert result["questions_asked"] <= 12
         assert len(result["recommendations"]) >= 3
 
-
-# ============================================================
-# E2E Test 7: Business owner seeking MUDRA loan
-# ============================================================
-
 class TestBusinessOwner:
     def test_business_owner_gets_mudra(self):
         """A small business owner should get MUDRA loan scheme."""
@@ -299,11 +240,6 @@ class TestBusinessOwner:
 
         assert result["questions_asked"] <= 12
         assert len(result["recommendations"]) >= 2
-
-
-# ============================================================
-# E2E Test 8: Woman with girl child
-# ============================================================
 
 class TestWomanWithGirlChild:
     def test_woman_with_girl_child_gets_sukanya(self):
@@ -326,11 +262,6 @@ class TestWomanWithGirlChild:
         assert result["questions_asked"] <= 12
         assert len(result["recommendations"]) >= 2
 
-
-# ============================================================
-# E2E Test 9: Farmer without land (tenant)
-# ============================================================
-
 class TestTenantFarmer:
     def test_tenant_farmer_gets_crop_insurance(self):
         """A tenant farmer should still get crop insurance (PMFBY)."""
@@ -351,11 +282,6 @@ class TestTenantFarmer:
 
         assert result["questions_asked"] <= 12
         assert len(result["recommendations"]) >= 1
-
-
-# ============================================================
-# E2E Test 10: Person with disability
-# ============================================================
 
 class TestDisabledPerson:
     def test_disabled_person_gets_disability_schemes(self):
@@ -378,11 +304,6 @@ class TestDisabledPerson:
         assert result["questions_asked"] <= 12
         assert len(result["recommendations"]) >= 2
 
-
-# ============================================================
-# E2E Test 11: High-income salaried — should get FEWER schemes
-# ============================================================
-
 class TestHighIncomeSalaried:
     def test_high_income_gets_fewer_schemes(self):
         """A high-income tax-paying salaried person should match fewer schemes."""
@@ -401,15 +322,9 @@ class TestHighIncomeSalaried:
             "is_government_employee": "No",
         })
 
-        # High income + tax payer should exclude many BPL/low-income schemes
         assert result["questions_asked"] <= 12
-        # Should still get some universal schemes
+
         assert len(result["recommendations"]) >= 1
-
-
-# ============================================================
-# E2E Test 12: ST woman in rural Jharkhand
-# ============================================================
 
 class TestSTWomanJharkhand:
     def test_st_woman_gets_multiple_schemes(self):
@@ -431,14 +346,9 @@ class TestSTWomanJharkhand:
         })
 
         assert result["questions_asked"] <= 12
-        # ST + female + BPL + rural should qualify for many schemes
+
         assert len(result["recommendations"]) >= 5, \
             f"Expected >=5 recommendations for ST BPL rural woman, got {len(result['recommendations'])}"
-
-
-# ============================================================
-# Test: Information gain decreases as questions are asked
-# ============================================================
 
 class TestInfoGainBehavior:
     def test_info_gain_is_positive_initially(self):
@@ -459,7 +369,6 @@ class TestInfoGainBehavior:
         """Different profiles should potentially get different first questions."""
         schemes = get_all_schemes_sync()
 
-        # Empty profile
         s1 = Session(
             session_id="t1",
             state=SessionState.QUESTIONING,
@@ -467,7 +376,6 @@ class TestInfoGainBehavior:
         )
         q1 = AdaptiveQuestionEngine.select_next_question(s1, schemes)
 
-        # After answering occupation=Farmer, next best question might differ
         s2 = Session(
             session_id="t2",
             state=SessionState.QUESTIONING,
@@ -476,17 +384,15 @@ class TestInfoGainBehavior:
             question_count=1,
         )
         s2.profile.occupation = "Farmer"
-        # Prune for farmer
+
         s2.candidates = EligibilityEngine.prune_candidates(
             s2.profile, schemes, s2.candidates
         )
         farmer_schemes = [s for s in schemes if s.id in s2.candidates]
         q2 = AdaptiveQuestionEngine.select_next_question(s2, farmer_schemes)
 
-        # Both should return a question
         assert q1 is not None
         assert q2 is not None
-
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

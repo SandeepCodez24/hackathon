@@ -1,8 +1,3 @@
-"""
-Session Manager — Redis-backed session CRUD with 24hr TTL.
-Falls back to in-memory dict when Redis is unavailable.
-"""
-
 import json
 import logging
 from datetime import datetime
@@ -13,8 +8,7 @@ from app.db.database import get_redis, get_memory_sessions
 
 logger = logging.getLogger(__name__)
 
-SESSION_TTL = 86400  # 24 hours in seconds
-
+SESSION_TTL = 86400
 
 class SessionManager:
     """Manage citizen conversation sessions."""
@@ -26,14 +20,12 @@ class SessionManager:
         if existing:
             return existing
 
-        # Create new session
         session = Session(
             session_id=session_id,
             channel=channel,
             state=SessionState.GREETING,
         )
 
-        # Initialize with all scheme IDs as candidates
         from app.db.scheme_orm import get_all_schemes
         all_schemes = await get_all_schemes()
         session.candidates = [s.id for s in all_schemes]
@@ -52,7 +44,7 @@ class SessionManager:
                 return Session(**json.loads(data))
             return None
         else:
-            # In-memory fallback
+
             sessions = get_memory_sessions()
             if session_id in sessions:
                 return Session(**sessions[session_id])

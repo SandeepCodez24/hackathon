@@ -1,15 +1,9 @@
-"""
-Scheme CRUD operations.
-Works with MongoDB when available, falls back to in-memory JSON.
-"""
-
 import logging
 from typing import Optional
 from app.db.database import get_db, is_using_memory, get_memory_schemes
 from app.models.scheme import Scheme, SchemeListResponse
 
 logger = logging.getLogger(__name__)
-
 
 async def get_all_schemes() -> list[Scheme]:
     """Get all schemes from database or memory."""
@@ -22,7 +16,6 @@ async def get_all_schemes() -> list[Scheme]:
 
     return [Scheme(**s) for s in raw]
 
-
 async def get_scheme_by_id(scheme_id: str) -> Optional[Scheme]:
     """Get single scheme by ID."""
     if is_using_memory():
@@ -34,7 +27,6 @@ async def get_scheme_by_id(scheme_id: str) -> Optional[Scheme]:
         db = get_db()
         doc = await db.schemes.find_one({"id": scheme_id}, {"_id": 0})
         return Scheme(**doc) if doc else None
-
 
 async def filter_schemes(
     category: Optional[str] = None,
@@ -91,13 +83,11 @@ async def filter_schemes(
 
     return results
 
-
 async def get_scheme_categories() -> list[str]:
     """Get unique scheme categories."""
     all_schemes = await get_all_schemes()
     categories = sorted(set(s.category for s in all_schemes))
     return categories
-
 
 async def seed_schemes_to_db(schemes: list[dict]) -> int:
     """Seed schemes into MongoDB (if available)."""
@@ -108,7 +98,7 @@ async def seed_schemes_to_db(schemes: list[dict]) -> int:
         return len(schemes)
 
     db = get_db()
-    # Clear existing and insert fresh
+
     await db.schemes.delete_many({})
     if schemes:
         await db.schemes.insert_many(schemes)

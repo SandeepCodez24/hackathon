@@ -1,15 +1,9 @@
-"""
-Eligibility Engine — Rule matching, scoring, and ranking.
-Core Phase 1 component that matches citizen profiles against scheme eligibility rules.
-"""
-
 import logging
 from typing import Optional
 from app.models.scheme import Scheme
 from app.models.session import CitizenProfile, SchemeRecommendation
 
 logger = logging.getLogger(__name__)
-
 
 class EligibilityEngine:
     """
@@ -37,7 +31,6 @@ class EligibilityEngine:
         passed_checks = 0
         hard_fail = False
 
-        # --- Age checks ---
         if rules.age_min is not None:
             total_checks += 1
             if profile.age is not None:
@@ -46,7 +39,7 @@ class EligibilityEngine:
                 else:
                     hard_fail = True
             else:
-                passed_checks += 0.5  # Unknown = partial credit
+                passed_checks += 0.5
 
         if rules.age_max is not None:
             total_checks += 1
@@ -58,7 +51,6 @@ class EligibilityEngine:
             else:
                 passed_checks += 0.5
 
-        # --- Income checks ---
         if rules.annual_income_max is not None:
             total_checks += 1
             if profile.annual_income is not None:
@@ -82,7 +74,6 @@ class EligibilityEngine:
             else:
                 passed_checks += 0.5
 
-        # --- Occupation ---
         if rules.occupation is not None:
             total_checks += 1
             if profile.occupation is not None:
@@ -98,9 +89,8 @@ class EligibilityEngine:
                     else:
                         hard_fail = True
             else:
-                passed_checks += 0.3  # Occupation is important — less partial credit
+                passed_checks += 0.3
 
-        # --- Gender ---
         if rules.gender is not None or rules.applicant_gender is not None:
             total_checks += 1
             required_gender = rules.gender or rules.applicant_gender
@@ -112,7 +102,6 @@ class EligibilityEngine:
             else:
                 passed_checks += 0.5
 
-        # --- Residence type ---
         if rules.residence_type is not None and rules.residence_type != "rural_or_urban":
             total_checks += 1
             if profile.residence_type is not None:
@@ -123,7 +112,6 @@ class EligibilityEngine:
             else:
                 passed_checks += 0.5
 
-        # --- Boolean checks ---
         bool_checks = [
             (rules.is_income_tax_payer, profile.is_income_tax_payer, True),
             (rules.is_government_employee, profile.is_government_employee, True),
@@ -135,7 +123,7 @@ class EligibilityEngine:
             (rules.has_girl_child, profile.has_girl_child, False),
             (rules.is_pregnant_or_lactating, profile.is_pregnant_or_lactating, False),
             (rules.has_bank_account, profile.has_bank_account, False),
-            (rules.has_savings_account, profile.has_bank_account, False),  # Map to same field
+            (rules.has_savings_account, profile.has_bank_account, False),
         ]
 
         for rule_val, profile_val, is_exclusion in bool_checks:
@@ -147,12 +135,11 @@ class EligibilityEngine:
                     elif is_exclusion:
                         hard_fail = True
                     else:
-                        # Soft fail for non-exclusion rules
+
                         pass
                 else:
-                    passed_checks += 0.5  # Unknown
+                    passed_checks += 0.5
 
-        # --- State check ---
         if rules.state is not None:
             total_checks += 1
             if profile.state is not None:
@@ -168,11 +155,10 @@ class EligibilityEngine:
                     else:
                         hard_fail = True
                 else:
-                    passed_checks += 1  # "ALL" states
+                    passed_checks += 1
             else:
                 passed_checks += 0.5
 
-        # --- Category / caste check ---
         if rules.category is not None:
             total_checks += 1
             if profile.caste is not None:
@@ -190,9 +176,8 @@ class EligibilityEngine:
             else:
                 passed_checks += 0.5
 
-        # Calculate confidence
         if total_checks == 0:
-            # No specific rules — scheme is broadly available
+
             confidence = 70.0
         elif hard_fail:
             confidence = 0.0
@@ -212,7 +197,6 @@ class EligibilityEngine:
         import re
         text = benefit_text.lower().replace(",", "")
         
-        # Match patterns like ₹6000, Rs. 5000, ₹5 lakh, ₹1 crore
         patterns = [
             (r'₹\s*([\d.]+)\s*crore', 10_000_000),
             (r'₹\s*([\d.]+)\s*lakh', 100_000),
@@ -274,7 +258,6 @@ class EligibilityEngine:
                     )
                 )
 
-        # Sort: confidence desc → benefit value desc → name asc
         recommendations.sort(
             key=lambda r: (
                 r.confidence,

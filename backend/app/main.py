@@ -1,14 +1,8 @@
-"""
-FastAPI main application entry point.
-GovScheme WhatsApp Chatbot — Backend Server
-"""
-
 import logging
 from pathlib import Path
 from dotenv import load_dotenv
 from contextlib import asynccontextmanager
 
-# Load .env from backend/ directory
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -19,24 +13,20 @@ from app.api.schemes import router as schemes_router
 from app.api.session_api import router as session_router
 from app.api.webhook_whatsapp import router as whatsapp_router
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)-7s | %(name)s | %(message)s",
 )
 logger = logging.getLogger(__name__)
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup and shutdown lifecycle."""
     logger.info("🚀 Starting GovScheme Backend...")
 
-    # Connect databases (gracefully falls back to in-memory)
     mongo_ok = await connect_mongodb()
     redis_ok = await connect_redis()
 
-    # Load and seed scheme data
     schemes = await load_schemes_from_files()
     count = await seed_schemes_to_db(schemes)
     logger.info(f"📋 {count} schemes loaded and ready")
@@ -47,10 +37,8 @@ async def lifespan(app: FastAPI):
 
     yield
 
-    # Shutdown
     await disconnect()
     logger.info("👋 GovScheme Backend stopped")
-
 
 app = FastAPI(
     title="GovScheme WhatsApp Chatbot API",
@@ -63,7 +51,6 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS — allow all origins for development
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -72,11 +59,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
 app.include_router(schemes_router)
 app.include_router(session_router)
 app.include_router(whatsapp_router)
-
 
 @app.get("/", tags=["health"])
 async def root():
@@ -89,7 +74,6 @@ async def root():
         "schemes_loaded": len(all_schemes),
         "docs": "/docs",
     }
-
 
 @app.get("/health", tags=["health"])
 async def health_check():

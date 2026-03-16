@@ -1,37 +1,27 @@
-"""
-Pydantic models for Government Scheme data.
-Matches the schema from schemes_eligibility.json and schemes_part2.json.
-"""
-
 from pydantic import BaseModel, Field
 from typing import Optional, Any
 
-
 class SchemeEligibilityRules(BaseModel):
     """Machine-readable eligibility rules for automated matching."""
-    # Age constraints
+
     age_min: Optional[int] = None
     age_max: Optional[int] = None
 
-    # Income constraints
     annual_income_max: Optional[int] = None
     monthly_income_max: Optional[int] = None
     annual_parental_income_max: Optional[int] = None
 
-    # Occupation / sector
-    occupation: Optional[Any] = None  # str or list
+    occupation: Optional[Any] = None
     business_sector: Optional[str] = None
     sector: Optional[str] = None
 
-    # Identity / status flags
     nationality: Optional[str] = None
     gender: Optional[str] = None
     applicant_gender: Optional[str] = None
-    category: Optional[Any] = None  # list like ["SC", "ST", "female"]
+    category: Optional[Any] = None
     residence_type: Optional[str] = None
-    state: Optional[Any] = None  # str or list
+    state: Optional[Any] = None
 
-    # Boolean conditions
     has_bank_account: Optional[bool] = None
     has_savings_account: Optional[bool] = None
     is_income_tax_payer: Optional[bool] = None
@@ -55,22 +45,18 @@ class SchemeEligibilityRules(BaseModel):
     willing_for_manual_labour: Optional[bool] = None
     is_digitally_literate: Optional[bool] = None
 
-    # Pension / special
     pension_monthly_max: Optional[int] = None
     age_70_plus_auto_eligible: Optional[bool] = None
     disability_pct_min: Optional[int] = None
     disability_pct_min_for_disability_pension: Optional[int] = None
     girl_child_age_max: Optional[int] = None
 
-    # Ration card
-    ration_card_type: Optional[Any] = None  # list
+    ration_card_type: Optional[Any] = None
 
-    # Education
     education_min_standard: Optional[int] = None
     enrolled_in_govt_school: Optional[bool] = None
     enrolled_in_govt_institution: Optional[bool] = None
 
-    # Scheme-specific
     grows_notified_crops: Optional[bool] = None
     previously_availed_housing_scheme: Optional[bool] = None
     entity_age_years_max: Optional[int] = None
@@ -80,8 +66,7 @@ class SchemeEligibilityRules(BaseModel):
     is_dairy_cooperative_member: Optional[bool] = None
 
     class Config:
-        extra = "allow"  # Allow additional fields we haven't explicitly modeled
-
+        extra = "allow"
 
 class Scheme(BaseModel):
     """Full scheme record matching the JSON data files."""
@@ -101,12 +86,10 @@ class Scheme(BaseModel):
         """Extract documents_required from eligibility dict."""
         return self.eligibility.get("documents_required", [])
 
-
 class SchemeListResponse(BaseModel):
     """API response for scheme listing."""
     total: int
     schemes: list[Scheme]
-
 
 class SchemeSearchQuery(BaseModel):
     """Search/filter query for schemes."""
